@@ -1,0 +1,163 @@
+
+
+body {
+    background:#39414A;
+    font: normal 62.5% "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif;
+    line-height:1.4;
+    width:1000px;
+    margin:0 auto;
+}
+
+#header {
+    text-align:center;
+    margin-bottom:20px;
+}
+
+#logo {
+    width:500px;
+}
+
+#sidebar, #content {
+    display:block;
+    float:left;
+    padding:5px;
+    
+    font-size:1.7em;
+    color:#FFFFFF;
+}
+
+#sidebar h2, 
+#content h2 {
+    font-size:2em;
+    color:#FFFFFF;
+}
+
+#content {
+    width:650px;
+    float:right;
+}
+
+#sidebar {
+    width:310px;
+    float:left;
+}
+
+#functions li, #methods li {
+	float:left;
+	display:block;
+	padding:5px;
+}
+
+a {
+	text-decoration:none;
+	color:#E5ECF3;
+}
+
+a.selected {
+	font-weight:bold;
+	color:#7295B2;
+}
+
+.requestInfo
+    margin-top:20px;
+}
+
+#curlCommand {
+	width:650px;
+	padding:5px;
+	margin:5px 0;
+	overflow:scroll;
+}
+
+.clearfix {
+    clear:both;
+    padding-bottom:20px;
+}
+
+div.fields {
+    padding-left:10px;
+}
+
+.fields h3 {
+    border-bottom:1px solid #FFFFFF;
+    margin:20px 0 5px 0;
+}
+
+.fields label {
+    float:left;
+}
+
+.fields input {
+    float:right;
+}
+
+#loader {
+    display:none;
+}
+
+#content label, 
+#content input {
+    display:block;
+    padding:5px;
+    float:left;
+    font-size:1.0em;
+}
+
+#content label {
+    width:100px;
+}
+
+#content input {
+    width:500px;
+}
+
+#sendRequest {
+	margin-top:10px;
+    display:block;
+    width:200px;
+    border:1px solid #ffffff;
+    text-align:center;
+}
+
+.duplicate {
+	text-decoration:underline;
+}
+
+#sendRequest:hover {
+    cursor:pointer;
+    background:#7295B2;
+}
+
+#previousUserList {
+    font-size:0.8em;
+}
+
+#previousUserList td {
+    padding:5px;
+}
+
+#previousUserList td.url {
+    border-right:1px solid #FFFFFF;
+}
+
+#previousUserList tr {
+    background:#669999;
+    color:#ffffff;
+}
+
+#previousUserList tr:hover {
+    background:#66FFCC;
+    color:#000000;
+    cursor:pointer;
+}
+
+#userDetails p {
+	position:relative
+}
+
+#userDetails label {
+	color:#CCCCCC;
+	position:absolute;
+	top:0;
+	left:0;
+}
