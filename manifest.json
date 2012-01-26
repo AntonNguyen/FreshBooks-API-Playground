@@ -2,11 +2,15 @@
 	"name": "FreshBooks Easy API",
 	"version": "1.0.0",
 	"description": "Easily interact and experiment with the FreshBooks API!",
-	"icons": {"16": "leaf.png", "48": "leaf.png", "128": "leaf.png"},
-	"permissions": ["tabs", "https://*.freshbooks.com/api/2.1/xml-in"],
+	"icons": {"16": "media/leaf.png", "48": "media/leaf.png", "128": "media/leaf.png"},
+	"permissions": ["tabs",
+					"https://*.freshbooks.com/api/2.1/xml-in",
+					"https://*.trunk.2ndsiteinc.com/api/2.1/xml-in",
+					"https://*.rc.2ndsiteinc.com/api/2.1/xml-in",
+					"https://*.freshbooksdev.com/api/2.1/xml-in"],
 	"browser_action": {
 		"default_title": "FreshBooks",
-		"default_icon": "leaf.png",
+		"default_icon": "media/leaf.png",
 		"popup": "popup.html"
 	}
 }
