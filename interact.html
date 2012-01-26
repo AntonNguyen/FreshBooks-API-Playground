@@ -1,0 +1,376 @@
+<html>
+	<head>
+		<title>FreshBooks Easy API</title>
+		<link rel="stylesheet" href="css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" />
+		<link rel="stylesheet" href="css/shCore.css" type="text/css" />
+		<link rel="stylesheet" href="css/shThemeDefault.css" type="text/css" />
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/jquery.hotkeys-0.7.9.min.js"></script>
+		<script type="text/javascript" src="js/shCore.js"></script>
+		<script type="text/javascript" src="js/shBrushXml.js"></script>
+		<script type="text/javascript" src="js/definition.json"></script>
+		<script type="text/javascript">
+			var newLine = '\r\n';
+			var currentElementName = "";
+			var currentElementMethods = "";
+			var currentMethodName = "";
+
+			$(document).ready(function() {
+				// Setup local storage
+				if (!localStorage.isInitialized) {
+					localStorage.isInitialized = true;
+					resetData();
+				} else {
+					loadData();
+				}
+
+				SyntaxHighlighter.highlight();
+
+				// Load up all the API Calls
+				$.each(functions, function(key, val) {
+					$('#functions').append('<li><a class="functions" href="#" alt="' + key + '">' + key + '</a></li>');
+				});
+
+				$('#sendRequest').click(function() {
+					makeServerRequest();
+					return false;
+				});
+
+				$(document).bind('keydown', 'Ctrl+s', makeServerRequest);
+
+				$('#apiURL').change(function() {
+					var code = createRequest();
+					generateCurlCommand(code);
+					saveData();
+				});
+
+				$('#apiToken').change(function() {
+					var code = createRequest();
+					generateCurlCommand(code);
+					saveData();
+				});
+			});
+
+			// Capture the API Call selection
+			$('a.functions').live("click", function() {
+
+				$('a.functions').removeClass("selected");
+				$(this).addClass("selected");
+
+				//Get the selected element
+				currentElementName = $(this).attr("alt");
+				currentElementMethods = functions[currentElementName];
+
+				// Clear any methods/functions and add the new ones
+				$('#methods').html("");
+				$('#fields').html("");
+				$.each(currentElementMethods, function(key, val) {
+					$('#methods').append('<li><a class="methods" href="#" alt="' + key + '">' + key + '</a></li>');
+				});
+
+				return false;
+			});
+
+			// Capture the Method Selection
+			$('a.methods').live("click", function() {
+
+				$('a.methods').removeClass("selected");
+				$(this).addClass("selected");
+
+				formerMethodName = currentMethodName
+				currentMethodName = $(this).attr("alt");
+
+				//Extract the fields from the selected method
+				$('#fields').html(exploreFields(currentElementMethods[currentMethodName]));
+
+				$('#currentCurlCommand').html(currentElementName + '.' + currentMethodName);
+
+				var code = createRequest();
+				displayCode('request', code);
+				generateCurlCommand(code);
+
+				$('#fields input:first').focus();
+
+				// Attempt to extract the newly created object id and inject it into the get method for retrieval
+				if (formerMethodName == 'create' && currentMethodName == 'get') {
+					var fieldName = "";
+					var newID = "";
+
+					$('#response code').each(function() {
+						if ($(this).text().indexOf("_id") >= 0) {
+							fieldName = $(this).text();
+							newID = $(this).next().text();
+							newID = newID.replace("<", "").replace(">", "").replace("/", "");
+							return false;
+						}
+					});
+
+					// Inject the id into the get parameter
+					$('input.fields').each(function() {
+						if ($(this).attr('alt') == fieldName) {
+							$(this).val(newID);
+						}
+					});
+				}
+
+				return false;
+			});
+
+			// Capture the Method Selection
+			$('a.duplicate').live("click", function() {
+				parent = $(this).parent();
+				copyElement = $(this).siblings('div')[0];
+
+				$(parent).append(copyElement.outerHTML);
+
+				return false;
+			});
+
+			// Update the curl command on every text change
+			$('input.fields').live("keyup", function() {
+				var code = createRequest();
+				displayCode('request', code);
+				generateCurlCommand(code);
+			});
+
+			// Recursively traverses the json object building the html form
+			function exploreFields(root) {
+				var fields = "";
+
+				$.each(root, function(key, val) {
+					if (val._text == undefined) {
+						fields += '<div class="fields" alt="' + key + '">';
+						fields += '<h3>' + key + '</h3>';
+
+						// Enable element duplication
+						if (key == 'lines' || key == 'gateways' || key == 'contacts') {
+							fields += '<a href="#" class="duplicate">Add more</a>';
+						}
+
+						fields += exploreFields(val);
+						fields +='</div>';
+					} else {
+						fields += '<label>' + key + '</label>';
+						fields += '<input class="fields" type="text" alt="' + key + '"></input><br/>';
+					}
+				});
+
+				return fields;
+			}
+
+			// Builds the curl command
+			function createRequest() {
+				var command = "";
+
+				if (currentElementName != "" && currentMethodName != "") {
+					command += '<request method="' + currentElementName + '.' + currentMethodName + '">';
+					command += parseFields($('#fields'), 1);
+					command += newLine + '</request>';
+				}
+
+				return command;
+			}
+
+			// Traverses the parent element in the DOM until it reaches the bottom, to build the curl commands
+			function parseFields(parent, level) {
+				parent = parent[0];
+
+				var xml = "";
+				var tempParseResult = "";
+
+				$.each($(parent).children(), function() {
+
+					if ($(this).is("input")) {
+						if ($(this).val() != "") {
+							xml += newLine + tabs(level) + '<' + $(this).attr("alt") + '>';
+							xml += $(this).val();
+							xml += '</' + $(this).attr("alt") + '>';
+						}
+					} else if ($(this).is("div")) {
+						tempParseResult = parseFields($(this), level + 1);
+
+						if (tempParseResult != "") {
+							xml += newLine + tabs(level) + '<' + $(this).attr("alt") + '>';
+							xml += '' + tempParseResult;
+							xml += newLine + tabs(level) + '</' + $(this).attr("alt") + '>';
+						}
+					}
+				});
+
+				return xml;
+			}
+
+			function tabs(count) {
+				var tabs = "";
+				for (var i = 0; i < count; i++) {
+					tabs += '\t';
+				}
+
+				return tabs;
+			}
+
+			function makeServerRequest() {
+				var apiURL = getSubdomain();
+				var apiToken = getToken();
+				var xmlRequest = createRequest();
+
+				if (apiURL == "") {
+					displayCode('response', "You have to provide a subdomain");
+					return;
+				}
+
+				if (apiToken == "") {
+					displayCode('response', "You have to provide a token");
+					return;
+				}
+
+				if (xmlRequest == "") {
+					displayCode('response', "You have to select a call and method");
+					return;
+				}
+
+				$('#response').hide();
+				$('#loader').show();
+
+				$.ajax({
+					type: "POST",
+					url: apiURL,
+					async: false,
+					data: xmlRequest,
+					dataType: "xml",
+					headers: {
+								'FB-User-Agent': "FreshBooks Easy API",
+								'Authorization': make_base_auth(apiToken, 'X'),
+								'content-type': 'application/x-www-form-urlencoded'
+							 },
+					complete: function(xhr, status) {
+						$('#loader').hide();
+						displayCode('response', xhr.responseText);
+					},
+					error: function() {
+						$('#loader').hide();
+						displayCode('response', "Unable to connect to server");
+					}
+				});
+			}
+
+			function displayCode(sectionID, code) {
+				var sectionJQ = "#" + sectionID;
+				var parent = $(sectionJQ).parent();
+
+				$(sectionJQ).remove();
+				$(parent).append('<pre id="' + sectionID + '" class="brush: xml; toolbar: false; auto-links:false;"></pre>');
+				$(sectionJQ).append(code);
+
+				SyntaxHighlighter.highlight();
+			}
+
+			function generateCurlCommand(code) {
+				var apiURL = getSubdomain();
+				var apiToken = getToken();
+
+				if (apiURL != "" && apiToken != "" && code != "") {
+					var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+
+					$('#curlCommand').html(command);
+				}
+			}
+
+			function getSubdomain() {
+				var apiURL = localStorage.subdomain;
+
+				if (apiURL != "") {
+					apiURL = 'https://' + apiURL + '/api/2.1/xml-in';
+				}
+
+				return apiURL;
+			}
+
+			function getToken() {
+				return localStorage.apikey;
+			}
+
+
+			function resetData() {
+				localStorage.subdomain = "";
+				localStorage.apikey = "";
+			}
+
+			function saveData() {
+				var url = $('#apiURL').val().trim();
+				var hostname = url.match("(https|http)?(://)?([a-zA-Z\.]*)?(/.*)?");
+
+				// Only save if we find a subdomain value
+				if (hostname[3]) {
+					localStorage.subdomain = hostname[3];
+				}
+				localStorage.apikey = $('#apiToken').val().trim();
+			}
+
+			function loadData() {
+				$('#apiURL').val(localStorage.subdomain);
+				$('#apiToken').val(localStorage.apikey);
+			}
+
+			function make_base_auth(user, password) {
+				var tok = user + ':' + password;
+				var hash = window.btoa(tok);
+				return "Basic " + hash;
+			}
+		</script>
+	</head>
+	<body>
+		<div id="header">
+			<img src="media/easyAPI.png" id="logo"/>
+		</div>
+
+		<div id="sidebar">
+			<h2>API Calls</h2>
+			<ul id="functions"></ul>
+			<div class="clearfix"></div>
+
+			<h2>Methods</h2>
+			<ul id="methods"></ul>
+			<div class="clearfix"></div>
+
+			<h2>Fields</h2>
+			<div id="fields" class="fields"></div>
+			<div class="clearfix"></div>
+		</div>
+
+		<div id="content">
+			<div id="userDetails" class="requestInfo">
+				<h2>User</h2>
+
+				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL"/></p>
+				<div class="clearfix"></div>
+
+				<p><input id="apiToken" placeholder="904227272c43ab27701c6b2dca7aeeb0" type="text" name="apiToken"/></p>
+			</div>
+			<div class="clearfix"></div>
+
+			<div class="requestInfo">
+				<h2>Request</h2>
+				<pre id="request" class="brush: xml; toolbar: false; auto-links:false;">
+				</pre>
+			</div>
+
+			<div class="requestInfo">
+				<h2>Curl Request</h2>
+				<textarea id="curlCommand" rows="1" wrap="off" style="width:659px"></textarea>
+			</div>
+
+			<a href="#" id="sendRequest" accesskey="S">Send Request</a>
+
+			<div class="requestInfo">
+				<h2>Response</h2>
+				<div id="loader">
+					<img src="media/ajax-loader.gif"/><br/>
+					<p>Shhh! I&apos;m thinking!</p>
+				</div>
+				<pre id="response" class="brush: xml; toolbar: false; auto-links:false;"></pre>
+			</div>
+		</div>
+	</body>
+</html>
