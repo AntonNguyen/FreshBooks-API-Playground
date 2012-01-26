@@ -460,6 +460,9 @@ var functions = {
 						tax2_percent:{
 							_text:""
 						},
+						compound_tax:{
+							_text:""
+						},
 						type:{
 							_text:""
 						}
@@ -566,6 +569,9 @@ var functions = {
 							_text:""
 						},
 						tax2_percent:{
+							_text:""
+						},
+						compound_tax:{
 							_text:""
 						},
 						type:{
@@ -675,6 +681,9 @@ var functions = {
 				tax2_amount:{
 					_text:""
 				},
+				compound_tax:{
+					_text:""
+				},
 			}
 		},
 		update:{
@@ -725,6 +734,9 @@ var functions = {
 					_text:""
 				},
 				tax2_amount:{
+					_text:""
+				},
+				compound_tax:{
 					_text:""
 				},
 			}
@@ -908,6 +920,9 @@ var functions = {
 						tax2_percent:{
 							_text:""
 						},
+						compound_tax:{
+							_text:""
+						},
 						type:{
 							_text:""
 						}
@@ -1029,6 +1044,9 @@ var functions = {
 						tax2_percent:{
 							_text:""
 						},
+						compound_tax:{
+							_text:""
+						},
 						type:{
 							_text:""
 						}
@@ -1133,6 +1151,9 @@ var functions = {
 					tax2_percent:{
 						_text:""
 					},
+					compound_tax:{
+						_text:""
+					},
 					type:{
 						_text:""
 					}
@@ -1180,6 +1201,9 @@ var functions = {
 					tax2_percent:{
 						_text:""
 					},
+					compound_tax:{
+						_text:""
+					},
 					type:{
 						_text:""
 					}
@@ -1205,6 +1229,12 @@ var functions = {
 				},
 				inventory:{
 					_text:""
+				},
+				tax1_id:{
+					_text:""
+				},
+				tax2_id:{
+					_text:""
 				}
 			}
 		},
@@ -1226,6 +1256,12 @@ var functions = {
 					_text:""
 				},
 				inventory:{
+					_text:""
+				},
+				tax1_id:{
+					_text:""
+				},
+				tax2_id:{
 					_text:""
 				}
 			}
@@ -1560,6 +1596,9 @@ var functions = {
 						tax2_percent:{
 							_text:""
 						},
+						compound_tax:{
+							_text:""
+						},
 						type:{
 							_text:""
 						}
@@ -1701,6 +1740,9 @@ var functions = {
 						tax2_percent:{
 							_text:""
 						},
+						compound_tax:{
+							_text:""
+						},
 						type:{
 							_text:""
 						}
@@ -1765,6 +1807,9 @@ var functions = {
 					tax2_percent:{
 						_text:""
 					},
+					compound_tax:{
+						_text:""
+					},
 					type:{
 						_text:""
 					}
@@ -1810,6 +1855,9 @@ var functions = {
 						_text:""
 					},
 					tax2_percent:{
+						_text:""
+					},
+					compound_tax:{
 						_text:""
 					},
 					type:{
