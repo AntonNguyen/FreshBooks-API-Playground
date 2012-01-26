@@ -21,6 +21,8 @@
 				if (!localStorage.isInitialized) {
 					localStorage.isInitialized = true;
 					resetData();
+
+					$('#apiURL').focus();
 				} else {
 					loadData();
 				}
