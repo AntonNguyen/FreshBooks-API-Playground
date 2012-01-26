@@ -37,7 +37,7 @@
 					return false;
 				});
 
-				$(document).bind('keydown', 'Ctrl+s', makeServerRequest);
+				$(document).bind('keydown', 'return', makeServerRequest);
 
 				$('#apiURL').change(function() {
 					var code = createRequest();
