@@ -304,7 +304,12 @@
 
 				// Only save if we find a subdomain value
 				if (hostname[3]) {
-					localStorage.subdomain = hostname[3];
+					// If only a subdomain is provided, we automatically append '.freshbooks.com'
+					subdomain = hostname[3];
+					if (subdomain.indexOf(".") < 0) {
+						subdomain = subdomain + ".freshbooks.com";
+					}
+					localStorage.subdomain = subdomain;
 				}
 				localStorage.apikey = $('#apiToken').val().trim();
 			}
