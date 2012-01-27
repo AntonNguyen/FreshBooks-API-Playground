@@ -84,6 +84,9 @@ var functions = {
 			},
 			per_page:{
 				_text:""
+			},
+			order:{
+				_text:""
 			}
 		}
 	},
@@ -348,6 +351,9 @@ var functions = {
 				_text:""
 			},
 			notes:{
+				_text:""
+			},
+			order:{
 				_text:""
 			}
 		}
@@ -769,6 +775,9 @@ var functions = {
 			},
 			folder:{
 				_text:""
+			},
+			order:{
+				_text:""
 			}
 		}
 	},
@@ -1104,6 +1113,9 @@ var functions = {
 			},
 			folder:{
 				_text:""
+			},
+			order:{
+				_text:""
 			}
 		},
 		getPDF: {
@@ -1285,6 +1297,9 @@ var functions = {
 			},
 			folder:{
 				_text:""
+			},
+			order:{
+				_text:""
 			}
 		}
 	},
@@ -1459,6 +1474,9 @@ var functions = {
 				_text:""
 			},
 			per_page:{
+				_text:""
+			},
+			order:{
 				_text:""
 			}
 		}
@@ -1869,42 +1887,20 @@ var functions = {
 	},
 
 	report:{
-                getInvoiceDetails: {
-        		status: {
+		getInvoiceDetails: {
+			status: {
 				_text:""
 			},
-                	client_id:{
-                                _text:""
-                        },
-                        date_from:{
-                                _text:""
-                        },
-                        date_to:{
-                                _text:""
-                        }
-		},
-                getEstimateDetails: {
-                        client_id:{
-                                _text:""
-                        },
-                        date_from:{
-                                _text:""
-                        },
-                        date_to:{
-                                _text:""
-                        }
-                },
-                getExpenseDetails: {
-                        client_id:{
-                                _text:""
-                        },
-                        date_from:{
-                                _text:""
-                        },
-                        date_to:{
-                                _text:""
-                        }
-                },
+			client_id:{
+				_text:""
+			},
+			date_from:{
+				_text:""
+			},
+			date_to:{
+				_text:""
+			}
+		}
 	},
 
 	staff:{
@@ -1920,6 +1916,9 @@ var functions = {
 				_text:""
 			},
 			per_page:{
+				_text:""
+			},
+			order:{
 				_text:""
 			}
 		}
@@ -2092,6 +2091,68 @@ var functions = {
 			},
 			project_id:{
 				_text:""
+			},
+			order:{
+				_text:""
+			}
+		}
+	},
+
+	tax:{
+		create:{
+			tax:{
+				name:{
+					_text:""
+				},
+				rate:{
+					_text:""
+				},
+				number:{
+					_text:""
+				},
+				compound:{
+					_text:""
+				}
+			}
+		},
+		update:{
+			tax:{
+				tax_id:{
+					_text:""
+				},
+				rate:{
+					_text:""
+				},
+				number:{
+					_text:""
+				},
+				compound:{
+					_text:""
+				}
+			}
+		},
+		get:{
+			tax_id:{
+				_text:""
+			}
+		},
+		list:{
+			page:{
+				_text:""
+			},
+			per_page:{
+				_text:""
+			},
+			compound:{
+				_text:""
+			},
+			order:{
+				_text:""
+			},
+		},
+		delete:{
+			tax_id:{
+				_text:""
 			}
 		}
 	},
@@ -2171,6 +2232,9 @@ var functions = {
 				_text:""
 			},
 			date_to:{
+				_text:""
+			},
+			order:{
 				_text:""
 			}
 		}
