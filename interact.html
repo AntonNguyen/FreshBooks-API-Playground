@@ -40,15 +40,16 @@
 				$(document).bind('keydown', 'return', makeServerRequest);
 
 				$('#apiURL').change(function() {
+					saveData();
 					var code = createRequest();
 					generateCurlCommand(code);
-					saveData();
+					
 				});
 
 				$('#apiToken').change(function() {
+					saveData();
 					var code = createRequest();
 					generateCurlCommand(code);
-					saveData();
 				});
 			});
 
@@ -300,7 +301,7 @@
 
 			function saveData() {
 				var url = $('#apiURL').val().trim();
-				var hostname = url.match("(https|http)?(://)?([a-zA-Z\.]*)?(/.*)?");
+				var hostname = url.match("(https|http)?(://)?([a-zA-Z0-9\.]*)?(/.*)?");
 
 				// Only save if we find a subdomain value
 				if (hostname[3]) {
