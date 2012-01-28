@@ -25,7 +25,29 @@
 					loadData();
 				}
 
+				// Look for verifiers
+				var querystring = window.location.href.split("?");
+				if (querystring.length > 1) {
+					querystring = querystring[1].split("&");
+					var token = "";
+					var verifier = "";
+
+					for (var i = 0; i < querystring.length; i++) {
+						var keypair = querystring[i].split("=");
+						if (keypair[0].toLowerCase() == "oauth_verifier") {
+							verifier = keypair[1];
+						}
+
+						if (keypair[0].toLowerCase() == "oauth_token") {
+							token = keypair[1];
+						}
+					}
+					requestAccessToken(token, verifier);
+				}
+
 				SyntaxHighlighter.highlight();
+				loadAuthPref();
+				toggleOAuthConnect();
 
 				// Load up all the API Calls
 				$.each(functions, function(key, val) {
@@ -37,19 +59,28 @@
 					return false;
 				});
 
+				$('#switch').click(function() {
+					if (localStorage.authPref == "token") {
+						localStorage.authPref = "oauth";
+					} else {
+						localStorage.authPref = "token";
+					}
+					loadAuthPref();
+					return false;
+				});
+
 				$(document).bind('keydown', 'return', makeServerRequest);
 
-				$('#apiURL').change(function() {
-					var code = createRequest();
-					generateCurlCommand(code);
-					saveData();
-				});
+				$('#connect').click(function() {
+					getOAuthRequestToken();
+				})
+			});
 
-				$('#apiToken').change(function() {
-					var code = createRequest();
-					generateCurlCommand(code);
-					saveData();
-				});
+			$('.authentication').live("keyup", function() {
+				saveData();
+				var code = createRequest();
+				generateCurlCommand(code);
+				toggleOAuthConnect();
 			});
 
 			// Capture the API Call selection
@@ -212,17 +243,11 @@
 			}
 
 			function makeServerRequest() {
-				var apiURL = getSubdomain();
-				var apiToken = getToken();
+				var apiURL = getResourceURL();
 				var xmlRequest = createRequest();
 
 				if (apiURL == "") {
 					displayCode('response', "You have to provide a subdomain");
-					return;
-				}
-
-				if (apiToken == "") {
-					displayCode('response', "You have to provide a token");
 					return;
 				}
 
@@ -231,12 +256,27 @@
 					return;
 				}
 
+				if (isTokenAuth()) {
+					makeTokenRequest(apiURL, xmlRequest);
+				} else {
+					makeOAuthRequest(apiURL, xmlRequest);
+				}
+			}
+
+			function makeTokenRequest(apiURL, xmlRequest) {
+				var apiToken = getToken();
+
+				if (apiToken == "") {
+					displayCode('response', "You have to provide a token");
+					return;
+				}
+
 				$('#response').hide();
 				$('#loader').show();
 
 				$.ajax({
 					type: "POST",
-					url: apiURL,
+					url: apiURL + '/api/2.1/xml-in',
 					async: true,
 					data: xmlRequest,
 					dataType: "xml",
@@ -256,6 +296,210 @@
 				});
 			}
 
+
+			function makeOAuthRequest(apiURL, xmlRequest) {
+				var consumerKey = getConsumerKey();
+				var consumerKeySecret = getConsumerKeySecret();
+				var accessToken = getAccessToken();
+				var accessTokenSecret = getAccessTokenSecret();
+
+				if (consumerKey == "") {
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKey == "") {
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKeySecret == "") {
+					displayCode('response', "You have to provide a consumer key secret");
+					return;
+				}
+
+				if (accessToken == "") {
+					displayCode('response', "You have to provide an access token");
+					return;
+				}
+
+				if (accessTokenSecret == "") {
+					displayCode('response', "You have to provide an access token secret");
+					return;
+				}
+
+				$('#response').hide();
+				$('#loader').show();
+
+				$.ajax({
+					type: "POST",
+					url: apiURL,
+					async: true,
+					data: xmlRequest,
+					dataType: "xml",
+					headers: {
+								'FB-User-Agent': "FreshBooks Easy API",
+								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, accessToken, accessTokenSecret),
+								'content-type': 'application/x-www-form-urlencoded'
+							 },
+					complete: function(xhr, status) {
+						$('#loader').hide();
+						displayCode('response', xhr.responseText);
+					},
+					error: function() {
+						$('#loader').hide();
+						displayCode('response', "Unable to connect to server");
+					}
+				});
+			}
+
+			function getOAuthRequestToken() {
+				var consumerKey = getConsumerKey();
+				var consumerKeySecret = getConsumerKeySecret();
+
+				if (consumerKey == "") {
+					console.log("dog");
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKey == "") {
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKeySecret == "") {
+					displayCode('response', "You have to provide a consumer key secret");
+					return;
+				}
+
+				$('#response').hide();
+
+				$.ajax({
+					type: "POST",
+					url: getRequestTokenURI(),
+					async: true,
+					dataType: "xml",
+					headers: {
+								'FB-User-Agent': "FreshBooks Easy API",
+								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, "", "", getExtensionURL(), ""),
+								'content-type': 'application/x-www-form-urlencoded'
+							 },
+					complete: function(xhr, status) {
+						// search for oauth_token
+						var parameters = xhr.responseText.split("&");
+						for (var i = 0; i < parameters.length; i++) {
+							var keypair = parameters[i].split("=");
+							if (keypair[0].toLowerCase() == "oauth_token") {
+								chrome.tabs.create({
+										url:getAuthorizeTokenURI(keypair[1])
+								});
+
+								chrome.tabs.getCurrent(function(tab) {
+									chrome.tabs.remove(tab.id);
+								});
+							}
+						}
+					},
+					error: function(xhr) {
+						displayCode('response', xhr.responseText);
+					}
+				});
+			}
+
+			function requestAccessToken(token, verifier) {
+				var consumerKey = getConsumerKey();
+				var consumerKeySecret = getConsumerKeySecret();
+
+				if (consumerKey == "") {
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKey == "") {
+					displayCode('response', "You have to provide a consumer key");
+					return;
+				}
+
+				if (consumerKeySecret == "") {
+					displayCode('response', "You have to provide a consumer key secret");
+					return;
+				}
+
+				$('#response').hide();
+
+				$.ajax({
+					type: "POST",
+					url: getAccessTokenURI(),
+					async: true,
+					dataType: "xml",
+					headers: {
+								'FB-User-Agent': "FreshBooks Easy API",
+								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, token, "", getExtensionURL(), verifier),
+								'content-type': 'application/x-www-form-urlencoded'
+							 },
+					complete: function(xhr, status) {
+						// search for access_token and access_token_secret
+						var parameters = xhr.responseText.split("&");
+						for (var i = 0; i < parameters.length; i++) {
+							var keypair = parameters[i].split("=");
+							if (keypair[0].toLowerCase() == "oauth_token") {
+								localStorage.accesstoken = keypair[1];
+							}
+
+							if (keypair[0].toLowerCase() == "oauth_token_secret") {
+								localStorage.accesstokensecret = keypair[1];
+							}
+						}
+						loadData();
+						window.location = getExtensionURL();
+					},
+					error: function(xhr) {
+						displayCode('response', xhr.responseText);
+					}
+				});
+			}
+
+			function getOAuthHeader(consumer, consumersecret, token, tokensecret, callback, verifier) {
+
+				var header = 'OAuth realm="",oauth_version="1.0",oauth_consumer_key="' + consumer +'",oauth_timestamp="'+ getTimestamp() +'",oauth_nonce="'+ getNonce() +'",oauth_signature_method="PLAINTEXT"';
+
+				// Add the consumer secret and access token secret
+				header += ',oauth_signature="' + consumersecret + '%2526';
+				if (tokensecret != "") {
+					header += tokensecret;
+				}
+				header += '"';
+
+				// Adding the token
+				if (token != "") {
+					header += ',oauth_token="'+ token + '"';
+				}
+
+				// Callback for getting a request token
+				if (callback != "") {
+					header += ',oauth_callback="'+ callback + '"';
+				}
+
+				// Verifier for getting access tokens
+				if (verifier != "") {
+					header += ',oauth_verifier="'+ verifier + '"';
+				}
+
+				return header;
+			}
+
+			function generateCurlCommand(code) {
+				var apiURL = getResourceURL();
+				var apiToken = getToken();
+
+				if (apiURL != "" && apiToken != "" && code != "") {
+					var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+
+					$('#curlCommand').html(command);
+				}
+			}
+
 			function displayCode(sectionID, code) {
 				var sectionJQ = "#" + sectionID;
 				var parent = $(sectionJQ).parent();
@@ -267,35 +511,44 @@
 				SyntaxHighlighter.highlight();
 			}
 
-			function generateCurlCommand(code) {
-				var apiURL = getSubdomain();
-				var apiToken = getToken();
+			function make_base_auth(user, password) {
+				var tok = user + ':' + password;
+				var hash = window.btoa(tok);
+				return "Basic " + hash;
+			}
 
-				if (apiURL != "" && apiToken != "" && code != "") {
-					var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
-
-					$('#curlCommand').html(command);
+			function loadAuthPref() {
+				if (localStorage.authPref == "token") {
+					$('#authTitle').text("Token User");
+					$('#oauthCredentials').hide();
+					$('#tokenCredentials').show();
+				} else {
+					$('#authTitle').text("OAuth User");
+					$('#oauthCredentials').show();
+					$('#tokenCredentials').hide();
 				}
 			}
 
-			function getSubdomain() {
-				var apiURL = localStorage.subdomain;
-
-				if (apiURL != "") {
-					apiURL = 'https://' + apiURL + '/api/2.1/xml-in';
+			function toggleOAuthConnect() {
+				if (getAccessToken() == "" && getAccessTokenSecret() == "") {
+					$('#connect').show();
+				} else {
+					$('#connect').hide();
 				}
-
-				return apiURL;
 			}
 
-			function getToken() {
-				return localStorage.apikey;
+			function isTokenAuth() {
+				return localStorage.authPref == "token";
 			}
-
 
 			function resetData() {
+				localStorage.authPref = "token";
 				localStorage.subdomain = "";
 				localStorage.apikey = "";
+				localStorage.consumerkey = "";
+				localStorage.consumersecret = "";
+				localStorage.accesstoken = "";
+				localStorage.accesstokensecret = "";
 			}
 
 			function saveData() {
@@ -311,18 +564,105 @@
 					}
 					localStorage.subdomain = subdomain;
 				}
+
 				localStorage.apikey = $('#apiToken').val().trim();
+				localStorage.consumerkey = $('#consumerKey').val().trim();
+				localStorage.consumersecret = $('#consumerSecret').val().trim();
+				localStorage.accesstoken = $('#accessToken').val().trim();
+				localStorage.accesstokensecret = $('#accessTokenSecret').val().trim();
 			}
 
 			function loadData() {
 				$('#apiURL').val(localStorage.subdomain);
 				$('#apiToken').val(localStorage.apikey);
+				$('#consumerKey').val(localStorage.consumerkey);
+				$('#consumerSecret').val(localStorage.consumersecret);
+				$('#accessToken').val(localStorage.accesstoken);
+				$('#accessTokenSecret').val(localStorage.accesstokensecret);
 			}
 
-			function make_base_auth(user, password) {
-				var tok = user + ':' + password;
-				var hash = window.btoa(tok);
-				return "Basic " + hash;
+			function getConsumerKey() {
+				return localStorage.consumerkey;
+			}
+
+			function getConsumerKeySecret() {
+				return localStorage.consumersecret;
+			}
+
+			function getAccessToken() {
+				return localStorage.accesstoken;
+			}
+
+			function getAccessTokenSecret() {
+				return localStorage.accesstokensecret;
+			}
+
+			function getSubdomain() {
+				return localStorage.subdomain;
+			}
+
+			function getExtensionURL() {
+				var url = document.URL.split("?");
+				url = url[0];
+				return url.replace("#", "");
+			}
+
+			function getResourceURL() {
+				var subdomain = getSubdomain();
+				if (subdomain != "") {
+					subdomain = 'https://' + subdomain + '/api/2.1/xml-in';
+				}
+
+				return subdomain
+			}
+
+			function getRequestTokenURI() {
+				var subdomain = getSubdomain();
+				if (subdomain != "") {
+					subdomain = 'https://' + subdomain + '/oauth/oauth_request.php';
+				}
+
+				return subdomain
+			}
+
+			function getAuthorizeTokenURI(token) {
+				var subdomain = getSubdomain();
+				if (subdomain != "") {
+					subdomain = 'https://' + subdomain + '/oauth/oauth_authorize.php?oauth_token=' + token;
+				}
+
+				return subdomain
+			}
+
+			function getAccessTokenURI() {
+				var subdomain = getSubdomain();
+				if (subdomain != "") {
+					subdomain = 'https://' + subdomain + '/oauth/oauth_access.php';
+				}
+
+				return subdomain
+			}
+
+			function getToken() {
+				return localStorage.apikey;
+			}
+
+			// From Netflix's oauth implementation
+			function getTimestamp() {
+				var t = (new Date()).getTime();
+				return Math.floor(t / 1000);
+			}
+
+			// From Netflix's oauth implementation
+			function getNonce() {
+				var nonceLength = 15;
+				var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+				var result = "";
+				for (var i = 0; i < nonceLength; ++i) {
+				var rnum = Math.floor(Math.random() * chars.length);
+					result += chars.substring(rnum, rnum+1);
+				}
+				return result;
 			}
 		</script>
 	</head>
@@ -347,12 +687,23 @@
 
 		<div id="content">
 			<div id="userDetails" class="requestInfo">
-				<h2>User</h2>
+				<h2 id="authTitle">Token User</h2>
+				<p><a href="#" id="switch">Switch</a></p>
 
-				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL"/></p>
+				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL" class="authentication"/></p>
 				<div class="clearfix"></div>
 
-				<p><input id="apiToken" placeholder="904227272c43ab27701c6b2dca7aeeb0" type="text" name="apiToken"/></p>
+				<div id="tokenCredentials">
+					<input id="apiToken" placeholder="API Token" type="text" name="apiToken" class="authentication"/>
+				</div>
+
+				<div id="oauthCredentials">
+					<input id="consumerKey" placeholder="Consumer Key" type="text" name="consumerKey" class="authentication"/>
+					<input id="consumerSecret" placeholder="Consumer Secret" type="text" name="consumerSecret" class="authentication"/>
+					<input id="accessToken" placeholder="Access Token" type="text" name="accessToken" class="authentication"/>
+					<input id="accessTokenSecret" placeholder="Access Token Secret" type="text" name="accessTokenSecret" class="authentication"/>
+					<a href="#" id="connect">No access token? Connect your account.</a>
+				</div>
 			</div>
 			<div class="clearfix"></div>
 

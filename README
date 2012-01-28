@@ -1,7 +1,4 @@
 Interact with the FreshBooks API within your browser!
 
 --To Do--
-1) OAuth Support
-	a) User credentials
-	b) Curl request
-2) Auto-populate ids when switching calls
+1) Auto-populate ids when switching calls
