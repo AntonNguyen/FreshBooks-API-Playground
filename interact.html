@@ -65,6 +65,9 @@
 					} else {
 						localStorage.authPref = "token";
 					}
+
+					var code = createRequest();
+					generateCurlCommand(code);
 					loadAuthPref();
 					return false;
 				});
@@ -491,12 +494,25 @@
 
 			function generateCurlCommand(code) {
 				var apiURL = getResourceURL();
-				var apiToken = getToken();
 
-				if (apiURL != "" && apiToken != "" && code != "") {
-					var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+				if (code != "" && apiURL != "") {
+					if (isTokenAuth()) {
+						var apiToken = getToken();
+						if (apiToken != "") {
+							var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+							$('#curlCommand').html(command);
+						}
+					} else {
+						var consumerkey = getConsumerKey();
+						var consumersecret = getConsumerKeySecret();
+						var accesstoken = getAccessToken();
+						var accesstokensecret = getAccessTokenSecret();
 
-					$('#curlCommand').html(command);
+						if (consumerkey != "" && consumersecret != "" && accesstoken != "" && accesstokensecret != "") {
+							var command = "curl -k -H 'Authorization : " + getOAuthHeader(consumerkey, consumersecret, accesstoken, accesstokensecret, "", "") + "' " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+							$('#curlCommand').html(command);
+						}
+					}
 				}
 			}
 
