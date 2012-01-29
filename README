@@ -1,5 +1,6 @@
 Interact with the FreshBooks API within your browser!
 
 --To Do--
-1) Auto-populate ids when switching calls
-2) Massive refactoring
+1) Massive refactoring
+2) Unsigned oauth requests (no consumer secret)
+3) Oauth validation before sending request

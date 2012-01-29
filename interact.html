@@ -14,7 +14,10 @@
 			var newLine = '\r\n';
 			var currentElementName = "";
 			var currentElementMethods = "";
+			var formerElementName = "";
+
 			var currentMethodName = "";
+			var formerMethodName = "";
 
 			$(document).ready(function() {
 				// Setup local storage
@@ -100,6 +103,7 @@
 
 			// Capture the API Call selection
 			$('a.functions').live("click", function() {
+				formerElementName = currentElementName;
 				currentMethodName = "";
 
 				$('a.functions').removeClass("selected");
@@ -121,6 +125,19 @@
 
 			// Capture the Method Selection
 			$('a.methods').live("click", function() {
+				var elementID = "";
+				var elementIDValue = "";
+
+				if (currentMethodName != 'create') {
+					// Extract the current id entered
+					$('input.fields').each(function() {
+						if ($(this).attr('alt').indexOf("_id") >= 0) {
+							elementID = $(this).attr('alt');
+							elementIDValue = $(this).val();
+							return false;
+						}
+					});
+				}
 
 				$('a.methods').removeClass("selected");
 				$(this).addClass("selected");
@@ -139,8 +156,8 @@
 
 				$('#fields input:first').focus();
 
-				// Attempt to extract the newly created object id and inject it into the get method for retrieval
-				if (formerMethodName == 'create' && currentMethodName == 'get') {
+				// Attempt to extract the newly created object id and auto-populate it anywhere its used
+				if (formerMethodName == 'create') {
 					var fieldName = "";
 					var newID = "";
 
@@ -159,6 +176,16 @@
 							$(this).val(newID);
 						}
 					});
+				} else {
+					// Inject the id into the get parameter
+					$('input.fields').each(function() {
+						if ($(this).attr('alt') == elementID) {
+							$(this).val(elementIDValue);
+						}
+					});
+					// Reset the values, so that it doesn't populate unknowingly
+					elementID = "";
+					elementIDValue = "";
 				}
 
 				return false;
