@@ -48,6 +48,7 @@
 				SyntaxHighlighter.highlight();
 				loadAuthPref();
 				toggleOAuthConnect();
+				toggleCurl();
 
 				// Load up all the API Calls
 				$.each(functions, function(key, val) {
@@ -56,6 +57,17 @@
 
 				$('#sendRequest').click(function() {
 					makeServerRequest();
+					return false;
+				});
+
+				$('#curl').click(function() {
+					if (localStorage.showcurl == "false") {
+						localStorage.showcurl = "true";
+					} else {
+						localStorage.showcurl = "false";
+					}
+
+					toggleCurl();
 					return false;
 				});
 
@@ -311,16 +323,6 @@
 					return;
 				}
 
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
-					return;
-				}
-
-				if (consumerKeySecret == "") {
-					displayCode('response', "You have to provide a consumer key secret");
-					return;
-				}
-
 				if (accessToken == "") {
 					displayCode('response', "You have to provide an access token");
 					return;
@@ -357,26 +359,19 @@
 			}
 
 			function getOAuthRequestToken() {
+				var url = getRequestTokenURI();
 				var consumerKey = getConsumerKey();
 				var consumerKeySecret = getConsumerKeySecret();
 
 				if (consumerKey == "") {
-					console.log("dog");
 					displayCode('response', "You have to provide a consumer key");
 					return;
 				}
 
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
+				if (url == "") {
+					displayCode('response', "You have to provide a subdomain");
 					return;
 				}
-
-				if (consumerKeySecret == "") {
-					displayCode('response', "You have to provide a consumer key secret");
-					return;
-				}
-
-				$('#response').hide();
 
 				$.ajax({
 					type: "POST",
@@ -413,11 +408,6 @@
 			function requestAccessToken(token, verifier) {
 				var consumerKey = getConsumerKey();
 				var consumerKeySecret = getConsumerKeySecret();
-
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
-					return;
-				}
 
 				if (consumerKey == "") {
 					displayCode('response', "You have to provide a consumer key");
@@ -553,11 +543,22 @@
 				}
 			}
 
+			function toggleCurl() {
+				if (localStorage.showcurl == "false") {
+					$('#curl').text("Show Curl Request");
+					$('#curlCommand').hide();
+				} else {
+					$('#curl').text("Hide Curl Request");
+					$('#curlCommand').show();
+				}
+			}
+
 			function isTokenAuth() {
 				return localStorage.authPref == "token";
 			}
 
 			function resetData() {
+				localStorage.showcurl = "false";
 				localStorage.authPref = "token";
 				localStorage.subdomain = "";
 				localStorage.apikey = "";
@@ -579,6 +580,8 @@
 						subdomain = subdomain + ".freshbooks.com";
 					}
 					localStorage.subdomain = subdomain;
+				} else {
+					localStorage.subdomain = "";
 				}
 
 				localStorage.apikey = $('#apiToken').val().trim();
@@ -703,8 +706,7 @@
 
 		<div id="content">
 			<div id="userDetails" class="requestInfo">
-				<h2 id="authTitle">Token User</h2>
-				<p><a href="#" id="switch">Switch</a></p>
+				<h2><span id="authTitle">Token User</span> <a href="#" id="switch">Switch</a></h2>
 
 				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL" class="authentication"/></p>
 				<div class="clearfix"></div>
@@ -723,19 +725,17 @@
 			</div>
 			<div class="clearfix"></div>
 
+			<hr/>
+
 			<div class="requestInfo">
-				<h2>Request</h2>
+				<h2>Request <a href="#" id="curl">Show Curl Request</a></h2>
+				<textarea id="curlCommand" rows="1" wrap="off" style="width:659px"></textarea>
 				<pre id="request" class="brush: xml; toolbar: false; auto-links:false;">
 				</pre>
 			</div>
 
-			<div class="requestInfo">
-				<h2>Curl Request</h2>
-				<textarea id="curlCommand" rows="1" wrap="off" style="width:659px"></textarea>
-			</div>
-
 			<a href="#" id="sendRequest" accesskey="S">Send Request</a>
-
+			<hr/>
 			<div class="requestInfo">
 				<h2>Response</h2>
 				<div id="loader">

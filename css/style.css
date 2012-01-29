@@ -32,6 +32,16 @@ body {
     color:#FFFFFF;
 }
 
+h2 a{
+    font-size:14px;
+    text-decoration:underline;
+}
+
+hr {
+    margin:20px 0;
+    border:1px solid;
+}
+
 #content {
     width:650px;
     float:right;
@@ -94,6 +104,7 @@ div.fields {
 #loader {
     display:none;
 }
+
 
 #content label,
 #content input {
