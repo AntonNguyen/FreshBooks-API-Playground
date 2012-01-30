@@ -21,15 +21,25 @@ body {
     display:block;
     float:left;
     padding:5px;
-    
+
     font-size:1.7em;
     color:#FFFFFF;
 }
 
-#sidebar h2, 
+#sidebar h2,
 #content h2 {
     font-size:2em;
     color:#FFFFFF;
+}
+
+h2 a{
+    font-size:14px;
+    text-decoration:underline;
+}
+
+hr {
+    margin:20px 0;
+    border:1px solid;
 }
 
 #content {
@@ -95,12 +105,19 @@ div.fields {
     display:none;
 }
 
-#content label, 
+
+#content label,
 #content input {
     display:block;
     padding:5px;
     float:left;
     font-size:1.0em;
+}
+
+#connect {
+    display:block;
+    padding:5px;
+    float:left;
 }
 
 #content label {

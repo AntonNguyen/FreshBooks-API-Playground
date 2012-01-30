@@ -615,6 +615,9 @@ var functions = {
 			},
 			folder:{
 				_text:""
+			},
+			order:{
+				_text:""
 			}
 		},
 		sendByEmail:{
@@ -1638,6 +1641,9 @@ var functions = {
 							_text:""
 						}
 					}
+				},
+				stopped:{
+					_text:""
 				},
 				date:{
 					_text:""

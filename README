@@ -1,7 +1,7 @@
 Interact with the FreshBooks API within your browser!
 
 --To Do--
-1) OAuth Support
-	a) User credentials
-	b) Curl request
-2) Auto-populate ids when switching calls
+1) Massive refactoring
+2) Unsigned oauth requests (no consumer secret)
+3) Oauth validation before sending request
+4) Add autoupdating (possible via github.com download section?)
