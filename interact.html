@@ -70,17 +70,21 @@
 						localStorage.showcurl = "false";
 					}
 
-				$('#apiURL').change(function() {
-					saveData();
-					var code = createRequest();
-					generateCurlCommand(code);
-					
+					toggleCurl();
+					return false;
 				});
 
-				$('#apiToken').change(function() {
-					saveData();
+				$('#switch').click(function() {
+					if (localStorage.authPref == "token") {
+						localStorage.authPref = "oauth";
+					} else {
+						localStorage.authPref = "token";
+					}
+
 					var code = createRequest();
 					generateCurlCommand(code);
+					loadAuthPref();
+					return false;
 				});
 
 				$(document).bind('keydown', 'return', makeServerRequest);
