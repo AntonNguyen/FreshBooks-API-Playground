@@ -1,6 +1,6 @@
 {
 	"name": "FreshBooks Easy API",
-	"version": "1.0.0",
+	"version": "2.2",
 	"description": "Easily interact and experiment with the FreshBooks API!",
 	"icons": {"16": "media/leaf.png", "48": "media/leaf.png", "128": "media/leaf.png"},
 	"permissions": ["tabs",
@@ -12,5 +12,6 @@
 		"default_title": "FreshBooks",
 		"default_icon": "media/leaf.png",
 		"popup": "popup.html"
-	}
+	},
+	"update_url" : "https://github.com/downloads/AntonNguyen/FreshBooks-API-Chrome-Extension/update.xml"
 }

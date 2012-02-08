@@ -146,7 +146,7 @@
 				currentMethodName = $(this).attr("alt");
 
 				//Extract the fields from the selected method
-				$('#fields').html(exploreFields(currentElementMethods[currentMethodName]));
+				$('#fields').html(exploreFields(currentElementMethods[currentMethodName], 0));
 
 				$('#currentCurlCommand').html(currentElementName + '.' + currentMethodName);
 
@@ -209,7 +209,7 @@
 			});
 
 			// Recursively traverses the json object building the html form
-			function exploreFields(root) {
+			function exploreFields(root, level) {
 				var fields = "";
 
 				$.each(root, function(key, val) {
@@ -218,11 +218,13 @@
 						fields += '<h3>' + key + '</h3>';
 
 						// Enable element duplication
-						if (key == 'lines' || key == 'gateways' || key == 'contacts') {
+						if (key == 'lines' || key == 'gateways' || key == 'contacts' || (key == 'staff' && level == 1) || key == 'tasks') {
+							console.log(key);
+							console.log(level);
 							fields += '<a href="#" class="duplicate">Add more</a>';
 						}
 
-						fields += exploreFields(val);
+						fields += exploreFields(val, level + 1);
 						fields +='</div>';
 					} else {
 						fields += '<label>' + key + '</label>';

@@ -1423,8 +1423,17 @@ var functions = {
 					_text:""
 				},
 				tasks:{
-					task_id:{
-						_text:""
+					task: {
+						task_id:{
+							_text:""
+						}
+					}
+				},
+				staff:{
+					staff:{
+						staff_id:{
+							_text:""
+						}
 					}
 				}
 			}
@@ -1458,6 +1467,13 @@ var functions = {
 				tasks:{
 					task_id:{
 						_text:""
+					}
+				},
+				staff:{
+					staff:{
+						staff_id:{
+							_text:""
+						}
 					}
 				}
 			}
@@ -1798,6 +1814,12 @@ var functions = {
 				_text:""
 			},
 			folder:{
+				_text:""
+			},
+			date_from:{
+				_text:""
+			},
+			date_to:{
 				_text:""
 			}
 		},
