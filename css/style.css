@@ -75,7 +75,7 @@ h2 {
 
 .input_grouping li a.selected {
     font-weight:bold;
-    color:#a0ce23;
+    color:#AAFF1E;
 }
 
 
@@ -152,14 +152,11 @@ div.fields {
     padding:5px;
     font-size:1.0em;
     margin:12px 7px 4px 7px;
+    width:634px;
 }
 
 #content label {
     width:100px;
-}
-
-#content input {
-    width:500px;
 }
 
 #sendRequest {
