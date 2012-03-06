@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="css/style.css" type="text/css" />
 		<link rel="stylesheet" href="css/shCore.css" type="text/css" />
 		<link rel="stylesheet" href="css/shThemeDefault.css" type="text/css" />
-		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery.hotkeys-0.7.9.min.js"></script>
 		<script type="text/javascript" src="js/shCore.js"></script>
 		<script type="text/javascript" src="js/shBrushXml.js"></script>
@@ -213,22 +213,26 @@
 				var fields = "";
 
 				$.each(root, function(key, val) {
-					if (val._text == undefined) {
-						fields += '<div class="fields" alt="' + key + '">';
-						fields += '<h3>' + key + '</h3>';
+					if (typeof val == "object") {
+						
+						if (typeof key == "string" ) {
+							fields += '<div class="fields" alt="' + key + '">';
+							fields += '<h3>' + key + '</h3>';
 
-						// Enable element duplication
-						if (key == 'lines' || key == 'gateways' || key == 'contacts' || (key == 'staff' && level == 1) || key == 'tasks') {
-							console.log(key);
-							console.log(level);
-							fields += '<a href="#" class="duplicate">Add more</a>';
+							// Enable element duplication
+							if (key == 'lines' || key == 'gateways' || key == 'contacts' || (key == 'staff' && level == 1) || key == 'tasks') {
+								fields += '<a href="#" class="duplicate">Add more</a>';
+							}
 						}
 
 						fields += exploreFields(val, level + 1);
-						fields +='</div>';
+
+						if (typeof key == "string" ) {
+							fields +='</div>';
+						}
 					} else {
-						fields += '<label>' + key + '</label>';
-						fields += '<input class="fields" type="text" alt="' + key + '"></input><br/>';
+						fields += '<div class="fieldgroup"><label>' + val + '</label>';
+						fields += '<input class="fields" type="text" alt="' + val + '"></input></div>';
 					}
 				});
 
@@ -256,13 +260,15 @@
 				var tempParseResult = "";
 
 				$.each($(parent).children(), function() {
-
-					if ($(this).is("input")) {
-						if ($(this).val() != "") {
-							xml += newLine + tabs(level) + '<' + $(this).attr("alt") + '>';
-							xml += $(this).val();
-							xml += '</' + $(this).attr("alt") + '>';
+					// fieldgroup divs contains the input
+					if ($(this).hasClass("fieldgroup")) {
+						var input = $("input", this)[0];
+						if ($(input).val() != "") {
+							xml += newLine + tabs(level) + '<' + $(input).attr("alt") + '>';
+							xml += $(input).val();
+							xml += '</' + $(input).attr("alt") + '>';
 						}
+					// All other divs contains a subgrouping
 					} else if ($(this).is("div")) {
 						tempParseResult = parseFields($(this), level + 1);
 
@@ -327,7 +333,8 @@
 					headers: {
 								'FB-User-Agent': "FreshBooks Easy API",
 								'Authorization': make_base_auth(apiToken, 'X'),
-								'content-type': 'application/x-www-form-urlencoded'
+								'content-type': 'application/x-www-form-urlencoded',
+								 'Origin': 'http://localhost'
 							 },
 					complete: function(xhr, status) {
 						$('#loader').hide();
@@ -715,26 +722,34 @@
 		</script>
 	</head>
 	<body>
-		<div id="header">
-			<img src="media/easyAPI.png" id="logo"/>
-		</div>
+		<h1>Easy API</h1>
 
 		<div id="sidebar">
-			<h2>API Calls</h2>
-			<ul id="functions"></ul>
-			<div class="clearfix"></div>
+			<div class="input_grouping">
+				<h2>API Calls</h2>
+				<hr/>
+				<ul id="functions"></ul>
+				<div class="clearfix"></div>
+			</div>
+			
 
-			<h2>Methods</h2>
-			<ul id="methods"></ul>
-			<div class="clearfix"></div>
+			<div class="input_grouping">
+				<h2>Methods</h2>
+				<hr/>
+				<ul id="methods"></ul>
+				<div class="clearfix"></div>
+			</div>
 
-			<h2>Fields</h2>
-			<div id="fields" class="fields"></div>
-			<div class="clearfix"></div>
+			<div class="input_grouping">
+				<h2>Fields</h2>
+				<hr/>
+				<div id="fields" class="fields"></div>
+				<div class="clearfix"></div>
+			</div>
 		</div>
 
 		<div id="content">
-			<div id="userDetails" class="requestInfo">
+			<div id="userDetails" class="requestInfo input_grouping">
 				<h2><span id="authTitle">Token User</span> <a href="#" id="switch">Switch</a></h2>
 
 				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL" class="authentication"/></p>
@@ -756,7 +771,7 @@
 
 			<hr/>
 
-			<div class="requestInfo">
+			<div class="requestInfo" class="input_grouping">
 				<h2>Request <a href="#" id="curl">Show Curl Request</a></h2>
 				<textarea id="curlCommand" rows="1" wrap="off" style="width:659px"></textarea>
 				<pre id="request" class="brush: xml; toolbar: false; auto-links:false;">
