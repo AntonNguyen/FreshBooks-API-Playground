@@ -91,7 +91,7 @@
 
 				$('#connect').click(function() {
 					getOAuthRequestToken();
-				})
+				});
 			});
 
 			$('.authentication').live("keyup", function() {
@@ -751,9 +751,8 @@
 		<div id="content">
 			<div id="userDetails" class="requestInfo input_grouping">
 				<h2><span id="authTitle">Token User</span> <a href="#" id="switch">Switch</a></h2>
-
+				<hr/>
 				<p><input id="apiURL" placeholder="subdomain.freshbooks.com" type="text" name="apiURL" class="authentication"/></p>
-				<div class="clearfix"></div>
 
 				<div id="tokenCredentials">
 					<input id="apiToken" placeholder="API Token" type="text" name="apiToken" class="authentication"/>
@@ -769,19 +768,19 @@
 			</div>
 			<div class="clearfix"></div>
 
-			<hr/>
-
-			<div class="requestInfo" class="input_grouping">
+			<div class="requestInfo input_grouping">
 				<h2>Request <a href="#" id="curl">Show Curl Request</a></h2>
-				<textarea id="curlCommand" rows="1" wrap="off" style="width:659px"></textarea>
+				<hr/>
+				<textarea id="curlCommand" rows="1" wrap="off"></textarea>
 				<pre id="request" class="brush: xml; toolbar: false; auto-links:false;">
 				</pre>
 			</div>
 
-			<a href="#" id="sendRequest" accesskey="S">Send Request</a>
-			<hr/>
-			<div class="requestInfo">
+			<a href="#" id="sendRequest" accesskey="S">Send Request</a><br/><br/>
+
+			<div class="requestInfo input_grouping">
 				<h2>Response</h2>
+				<hr/>
 				<div id="loader">
 					<img src="media/ajax-loader.gif"/><br/>
 					<p>Shhh! I&apos;m thinking!</p>
