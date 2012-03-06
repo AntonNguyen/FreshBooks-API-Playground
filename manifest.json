@@ -1,6 +1,6 @@
 {
 	"name": "FreshBooks Easy API",
-	"version": "2.2",
+	"version": "2.6",
 	"description": "Easily interact and experiment with the FreshBooks API!",
 	"icons": {"16": "media/leaf.png", "48": "media/leaf.png", "128": "media/leaf.png"},
 	"permissions": ["tabs",

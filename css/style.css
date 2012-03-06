@@ -18,7 +18,7 @@ input {
 
 h1 {
     text-align: center;
-    font-size: 40px;
+    font-size: 45px;
     font-weight: bold;
     color: #0d83dd;
 }
@@ -34,7 +34,7 @@ h2 {
 
 .syntaxhighlighter, textarea {
     width: 623px;
-    margin:0px 0px 7px 7px;
+    margin:15px 0px 7px 7px;
 }
 
 #header {
@@ -103,14 +103,10 @@ h2 {
 	padding:5px;
 }
 
-.requestInfo
-    margin-top:20px;
-}
-
 #curlCommand {
-	width:650px;
+	width:635px;
 	padding:5px;
-	margin:5px 0;
+	margin:5px 7px;
 	overflow:scroll;
 }
 
@@ -155,7 +151,7 @@ div.fields {
     display:block;
     padding:5px;
     font-size:1.0em;
-    margin:4px 7px;
+    margin:12px 7px 4px 7px;
 }
 
 #content label {
@@ -176,10 +172,11 @@ div.fields {
     border: 1px solid #558a0f;
     color: #fff;
     font: bold 20px Arial, Helvetica, sans-serif;
-    width: 300px;
-    height: 50px;
     padding:5px;
+    width:136px;
     text-decoration: none;
+    margin: 10px 0 4px 7px;
+    display:block;
 }
 
 #sendRequest:hover {
@@ -197,6 +194,6 @@ div.fields {
     color:#fff;
 }
 
-#content div {
-    padding-bottom:4px;
+#content .requestInfo {
+    padding-bottom:10px;
 }
