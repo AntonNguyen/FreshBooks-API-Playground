@@ -12,6 +12,5 @@
 		"default_title": "FreshBooks",
 		"default_icon": "media/leaf.png",
 		"popup": "popup.html"
-	},
-	"update_url" : "https://github.com/downloads/AntonNguyen/FreshBooks-API-Chrome-Extension/update.xml"
+	}
 }
