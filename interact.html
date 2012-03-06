@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>FreshBooks Easy API</title>
+		<title>FreshBooks API Playground</title>
 		<link rel="stylesheet" href="css/reset.css" type="text/css" />
 		<link rel="stylesheet" href="css/style.css" type="text/css" />
 		<link rel="stylesheet" href="css/shCore.css" type="text/css" />
@@ -331,7 +331,7 @@
 					data: xmlRequest,
 					dataType: "xml",
 					headers: {
-								'FB-User-Agent': "FreshBooks Easy API",
+								'FB-User-Agent': "FreshBooks API Playground",
 								'Authorization': make_base_auth(apiToken, 'X'),
 								'content-type': 'application/x-www-form-urlencoded',
 								 'Origin': 'http://localhost'
@@ -379,7 +379,7 @@
 					data: xmlRequest,
 					dataType: "xml",
 					headers: {
-								'FB-User-Agent': "FreshBooks Easy API",
+								'FB-User-Agent': "FreshBooks API Playground",
 								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, accessToken, accessTokenSecret),
 								'content-type': 'application/x-www-form-urlencoded'
 							 },
@@ -415,7 +415,7 @@
 					async: true,
 					dataType: "xml",
 					headers: {
-								'FB-User-Agent': "FreshBooks Easy API",
+								'FB-User-Agent': "FreshBooks API Playground",
 								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, "", "", getExtensionURL(), ""),
 								'content-type': 'application/x-www-form-urlencoded'
 							 },
@@ -463,7 +463,7 @@
 					async: true,
 					dataType: "xml",
 					headers: {
-								'FB-User-Agent': "FreshBooks Easy API",
+								'FB-User-Agent': "FreshBooks API Playground",
 								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, token, "", getExtensionURL(), verifier),
 								'content-type': 'application/x-www-form-urlencoded'
 							 },
@@ -722,7 +722,7 @@
 		</script>
 	</head>
 	<body>
-		<h1>Easy API</h1>
+		<h1>FreshBooks API Playground</h1>
 
 		<div id="sidebar">
 			<div class="input_grouping">

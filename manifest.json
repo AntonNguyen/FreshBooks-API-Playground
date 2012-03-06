@@ -1,5 +1,5 @@
 {
-	"name": "FreshBooks Easy API",
+	"name": "FreshBooks API Playground",
 	"version": "2.6",
 	"description": "Easily interact and experiment with the FreshBooks API!",
 	"icons": {"16": "media/leaf.png", "48": "media/leaf.png", "128": "media/leaf.png"},
