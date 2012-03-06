@@ -140,6 +140,10 @@ div.fields {
 
 #loader {
     display:none;
+    color:#FFFFFF;
+    margin: 0 auto;
+    padding:20px;
+    text-align:center;
 }
 
 
