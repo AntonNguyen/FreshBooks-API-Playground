@@ -451,7 +451,7 @@ var functions = {
 			"recurring_id"
 		],
 		"list":[
-			"page", "per_page", "client_id", "autobil", "folder", "date_from", "date_to"
+			"page", "per_page", "client_id", "autobill", "folder", "date_from", "date_to", "updated_from", "updated_to"
 		],
 		"lines.add":[
 			"recurring_id",
