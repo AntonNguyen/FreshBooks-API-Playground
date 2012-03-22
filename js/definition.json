@@ -140,6 +140,9 @@ var functions = {
 		"sendByEmail":[
 			"estimate_id"
 		],
+		"getPDF":[
+			"estimate_id"
+		],
 		"accept":[
 			"estimate_id"
 		],
@@ -208,7 +211,12 @@ var functions = {
 				{"lines":[
 					{"line":[
 						"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
+						"tax1_percent", "tax2_percent", "compound_tax", "type", "expense_id",
+						{"time_entries" : [
+							{"time_entry": [
+								"time_entry_id"
+							]}
+						]}
 					]}
 				]},
 				{"gateways":[
@@ -385,6 +393,25 @@ var functions = {
 		]
 	},
 
+	"receipt":{
+		"create":[
+			{"receipt":[
+				"expense_id", "image"
+			]}
+		],
+		"update":[
+			{"receipt":[
+				"expense_id", "image"
+			]}
+		],
+		"get":[
+			"expense_id"
+		],
+		"delete":[
+			"expense_id"
+		],
+	},
+
 	"recurring":{
 		"create":[
 			{"recurring":[
@@ -478,8 +505,17 @@ var functions = {
 
 	"report":{
 		"getInvoiceDetails": [
-			"status", "client_id", "date_from", "date_to"
-		]
+			"status", "client_id", "date_from", "date_to", "group_by"
+		],
+		"getEstimateDetails": [
+			"client_id", "date_from", "date_to"
+		],
+		"getExpenseDetails": [
+			"client_id", "date_from", "date_to", "group_by"
+		],
+		"getProfitDetails": [
+			"client_id", "date_from", "date_to", "group_by"
+		],
 	},
 
 	"staff":{

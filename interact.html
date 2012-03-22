@@ -94,6 +94,32 @@
 				});
 			});
 
+			function downloadFile(url, xml, authorization, contentType) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', url, true);
+				xhr.setRequestHeader('Authorization', authorization);
+				xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+				xhr.responseType = 'arraybuffer';
+
+				xhr.onload = function(e) {
+					if (this.status == 200) {
+						var bb = new window.WebKitBlobBuilder();
+						bb.append(this.response);
+
+						var blob = bb.getBlob(contentType);
+						var blobURL = window.webkitURL.createObjectURL(blob);
+
+						chrome.tabs.create({
+								url:blobURL
+						});
+					}
+					$('#loader').hide();
+					displayCode('response', "Download complete!");
+				};
+
+				xhr.send(xml);
+			}
+
 			$('.authentication').live("keyup", function() {
 				saveData();
 				var code = createRequest();
@@ -129,7 +155,7 @@
 				var elementIDValue = "";
 
 				if (currentMethodName != 'create') {
-					// Extract the current id entered
+					// extracttract the current id entered
 					$('input.fields').each(function() {
 						if ($(this).attr('alt').indexOf("_id") >= 0) {
 							elementID = $(this).attr('alt');
@@ -306,91 +332,78 @@
 					return;
 				}
 
+				var authorization = "";
+
+				// Validate requests
 				if (isTokenAuth()) {
-					makeTokenRequest(apiURL, xmlRequest);
+					var apiToken = getToken();
+
+					if (apiToken == "") {
+						displayCode('response', "You have to provide a token");
+						return;
+					}
+					authorization = make_base_auth(apiToken, 'X');
 				} else {
-					makeOAuthRequest(apiURL, xmlRequest);
-				}
-			}
+					var consumerKey = getConsumerKey();
+					var consumerKeySecret = getConsumerKeySecret();
+					var accessToken = getAccessToken();
+					var accessTokenSecret = getAccessTokenSecret();
 
-			function makeTokenRequest(apiURL, xmlRequest) {
-				var apiToken = getToken();
+					if (consumerKey == "") {
+						displayCode('response', "You have to provide a consumer key");
+						return;
+					}
 
-				if (apiToken == "") {
-					displayCode('response', "You have to provide a token");
-					return;
+					if (accessToken == "") {
+						displayCode('response', "You have to provide an access token");
+						return;
+					}
+
+					if (accessTokenSecret == "") {
+						displayCode('response', "You have to provide an access token secret");
+						return;
+					}
+					authorization = getOAuthHeader(consumerKey, consumerKeySecret, accessToken, accessTokenSecret);
 				}
 
 				$('#response').hide();
 				$('#loader').show();
 
-				$.ajax({
-					type: "POST",
-					url: apiURL,
-					async: true,
-					data: xmlRequest,
-					dataType: "xml",
-					headers: {
-								'FB-User-Agent': "FreshBooks API Playground",
-								'Authorization': make_base_auth(apiToken, 'X'),
-								'content-type': 'application/x-www-form-urlencoded'
-							 },
-					complete: function(xhr, status) {
-						$('#loader').hide();
-						displayCode('response', xhr.responseText);
-					},
-					error: function() {
-						$('#loader').hide();
-						displayCode('response', "Unable to connect to server");
-					}
-				});
-			}
+				if (currentMethodName.toLowerCase() == 'getpdf') {
+					downloadFile(apiURL, xmlRequest, authorization, 'application/pdf');
+					displayCode('response', 'PDF Downloading..');
+				} else if (currentElementName == 'receipt' && currentMethodName == 'get') {
+					downloadFile(apiURL, xmlRequest, authorization, 'image/xyz');
+					displayCode('response', 'Image Downloading..');
+				} else if (currentElementName == 'receipt' && (currentMethodName == 'create' || currentMethodName == 'update')) {
+					uploadFile(apiURL, xmlRequest, authorization);
+				} else {
+					$.ajax({
+						type: "POST",
+						url: apiURL,
+						async: true,
+						data: xmlRequest,
+						headers: {
+									'FB-User-Agent': "FreshBooks API Playground",
+									'Authorization': authorization,
+									'content-type': 'application/x-www-form-urlencoded'
+								 },
+						dataType: "arraybuffer",
+						complete: function(xhr, status) {
+							$('#loader').hide();
+							if (status != 'error') {
+								displayCode('response', xhr.responseText);
+							} else {
 
+							}
 
-			function makeOAuthRequest(apiURL, xmlRequest) {
-				var consumerKey = getConsumerKey();
-				var consumerKeySecret = getConsumerKeySecret();
-				var accessToken = getAccessToken();
-				var accessTokenSecret = getAccessTokenSecret();
-
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
-					return;
+						},
+						error: function() {
+							$('#loader').hide();
+							displayCode('response', "Unable to connect to server");
+						}
+					});
 				}
-
-				if (accessToken == "") {
-					displayCode('response', "You have to provide an access token");
-					return;
-				}
-
-				if (accessTokenSecret == "") {
-					displayCode('response', "You have to provide an access token secret");
-					return;
-				}
-
-				$('#response').hide();
-				$('#loader').show();
-
-				$.ajax({
-					type: "POST",
-					url: apiURL,
-					async: true,
-					data: xmlRequest,
-					dataType: "xml",
-					headers: {
-								'FB-User-Agent': "FreshBooks API Playground",
-								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, accessToken, accessTokenSecret),
-								'content-type': 'application/x-www-form-urlencoded'
-							 },
-					complete: function(xhr, status) {
-						$('#loader').hide();
-						displayCode('response', xhr.responseText);
-					},
-					error: function() {
-						$('#loader').hide();
-						displayCode('response', "Unable to connect to server");
-					}
-				});
 			}
 
 			function getOAuthRequestToken() {
