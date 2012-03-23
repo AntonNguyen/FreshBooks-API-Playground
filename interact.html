@@ -273,9 +273,15 @@
 				// Clear any methods/resources and add the new ones
 				$('#methods').html("");
 				$('#fields').html("");
+				var numMethods = 0;
 				$.each(currentElementMethods, function(key, val) {
 					$('#methods').append('<li><a class="methods" href="#" alt="' + key + '">' + key + '</a></li>');
+					numMethods++;
 				});
+
+				if (numMethods == 1) {
+					selectMethod($('a.methods')[0]);
+				}
 			}
 
 			function selectMethod(method) {
