@@ -87,8 +87,6 @@
 					return false;
 				});
 
-				$(document).bind('keydown', 'return', makeServerRequest);
-
 				$('#connect').click(function() {
 					getOAuthRequestToken();
 				});
@@ -125,9 +123,6 @@
 						var blob = bb.getBlob(contentType);
 						var blobURL = window.webkitURL.createObjectURL(blob);
 
-						chrome.tabs.create({
-								url:blobURL
-						});
 						if (contentType == 'application/pdf') {
 							window.open(blobURL);
 						} else {
