@@ -101,8 +101,6 @@
 				$(document).bind('keydown', 'alt+ctrl+l', cycleNextResource);
 				$(document).bind('keydown', 'alt+ctrl+j', cyclePrevMethod);
 				$(document).bind('keydown', 'alt+ctrl+k', cycleNextMethod);
-
-				// document.getElementById('fileupload').addEventListener('change', upload, false);
 			});
 
 			function cyclePrevResource() {
@@ -173,8 +171,6 @@
 						var bb = new window.WebKitBlobBuilder();
 						bb.append(this.response);
 
-						var textblob = bb.getBlob('text/plain');
-						console.log(textblob);
 						var blob = bb.getBlob(contentType);
 						var blobURL = window.webkitURL.createObjectURL(blob);
 
