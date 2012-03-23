@@ -194,3 +194,42 @@ div.fields {
 #content .requestInfo {
     padding-bottom:10px;
 }
+
+.overlay{
+    background-color:#000;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    opacity: 0.5;
+    z-index:100;
+}
+
+.box {
+    position:fixed;
+    top:-200px;
+    left:10%;
+    right:10%;
+    background-color:#fff;
+    color:#7F7F7F;
+    padding:20px;
+    border:1px solid #ccc;
+    -webkit-border-radius:20px;
+    z-index:101;
+}
+
+a.boxclose{
+    float:right;
+    width:26px;
+    height:26px;
+    background:transparent url(/media/cancel.png) repeat top left;
+    margin-top:-30px;
+    margin-right:-30px;
+    cursor:pointer;
+}
+
+#receipt {
+    margin: 0 auto;
+    display:block;
+}

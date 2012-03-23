@@ -92,9 +92,25 @@
 				$('#connect').click(function() {
 					getOAuthRequestToken();
 				});
+
+				$('#boxclose').click(function(){
+					hideBox();
+				});
+
+				$(document).bind('keydown', 'return', makeServerRequest);
+				$(document).bind('keydown', 'esc', hideBox);
+				// document.getElementById('fileupload').addEventListener('change', upload, false);
+
 			});
 
-			function downloadFile(url, xml, authorization, contentType) {
+			function hideBox() {
+				$('#box').animate({'top':'-100px'},500,function(){
+					$('#overlay').fadeOut('fast');
+				});
+				$('#box').hide();
+			}
+
+			function downloadFile(url, xml, authorization, contentType, fileType) {
 				var xhr = new XMLHttpRequest();
 				xhr.open('POST', url, true);
 				xhr.setRequestHeader('Authorization', authorization);
@@ -112,6 +128,16 @@
 						chrome.tabs.create({
 								url:blobURL
 						});
+						if (contentType == 'application/pdf') {
+							window.open(blobURL);
+						} else {
+							$('#receipt').attr("src", blobURL);
+							$('#overlay').fadeIn('fast',function(){
+								$('#box').show();
+								$('#box').animate({'top':'160px'},500);
+							});
+						}
+
 					}
 					$('#loader').hide();
 					displayCode('response', "Download complete!");
@@ -798,6 +824,11 @@
 				</div>
 				<pre id="response" class="brush: xml; toolbar: false; auto-links:false;"></pre>
 			</div>
+		</div>
+		<div id="overlay" class="overlay" style="display:none"></div>
+		<div id="box" class="box">
+			<a class="boxclose" id="boxclose"></a>
+			<img id="receipt" src="/media/leaf.png"/>
 		</div>
 	</body>
 </html>
