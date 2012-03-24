@@ -2,14 +2,6 @@
       
   Get up and running with the FreshBooks API instantly with this Google Chrome Extension!
 
-## Installation
-
-    $ npm install express
-
-or to access the `express(1)` executable install globally:
-
-    $ npm install -g express
-
 ## Quick Start
 
  You can install the compiled app in Google Chrome by downloading the .crx file in the download section: 
@@ -22,14 +14,6 @@ or to access the `express(1)` executable install globally:
     Enable Developer mode by checking it off
     Click on "Load unpacked extension"
     Select the FreshBooks API Library folder
-
- Install dependencies:
-
-    $ npm install -d
-
- Start the server:
-
-    $ node app.js
 
 ## Features
 
