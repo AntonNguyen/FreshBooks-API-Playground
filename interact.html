@@ -465,8 +465,6 @@
 				} else if (currentElementName == 'receipt' && currentMethodName == 'get') {
 					downloadFile(apiURL, xmlRequest, authorization, 'image/xyz');
 					displayCode('response', 'Image Downloading..');
-				} else if (currentElementName == 'receipt' && (currentMethodName == 'create' || currentMethodName == 'update')) {
-					uploadFile(apiURL, xmlRequest, authorization);
 				} else {
 					$.ajax({
 						type: "POST",

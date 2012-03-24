@@ -394,16 +394,6 @@ var apiResources = {
 	},
 
 	"receipt":{
-		"create":[
-			{"receipt":[
-				"expense_id", "image"
-			]}
-		],
-		"update":[
-			{"receipt":[
-				"expense_id", "image"
-			]}
-		],
 		"get":[
 			"expense_id"
 		],
