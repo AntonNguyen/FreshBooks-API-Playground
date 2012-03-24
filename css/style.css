@@ -99,6 +99,10 @@ h2 {
 	padding:5px;
 }
 
+a.resources:focus {
+    outline: none;
+}
+
 #curlCommand {
 	width:635px;
 	padding:5px;
