@@ -7,57 +7,44 @@
 		<link rel="stylesheet" href="css/shThemeDefault.css" type="text/css" />
 		<script type="text/javascript" src="js/jquery.js"></script>
 		<script type="text/javascript" src="js/jquery.hotkeys-0.7.9.min.js"></script>
+		<script type="text/javascript" src="js/Class.js"></script>
+		<script type="text/javascript" src="js/FreshBooks.js"></script>
+		<script type="text/javascript" src="js/Transport.js"></script>
+		<script type="text/javascript" src="js/Token.js"></script>
+		<script type="text/javascript" src="js/OAuth.js"></script>
+		<script type="text/javascript" src="js/OAuthRequestToken.js"></script>
+		<script type="text/javascript" src="js/OAuthAccessToken.js"></script>
 		<script type="text/javascript" src="js/shCore.js"></script>
 		<script type="text/javascript" src="js/shBrushXml.js"></script>
 		<script type="text/javascript" src="js/definition.json"></script>
 		<script type="text/javascript">
 			var newLine = '\r\n';
-			var currentElementName = "";
-			var currentElementMethods = "";
-			var formerElementName = "";
+			var currentResource = "";
+			var currentResourceMethods = "";
+			var formerResource = "";
 
-			var currentMethodName = "";
-			var formerMethodName = "";
+			var currentMethod = "";
+			var formerMethod = "";
+			var fb = null;
 
 			$(document).ready(function() {
-				// Setup local storage
-				if (!localStorage.isInitialized) {
-					localStorage.isInitialized = true;
-					resetData();
-				} else {
-					loadData();
-				}
+				fb = new FreshBooks();
+				detectOAuthCallbackAttempt();
 
-				// Look for verifiers
-				var querystring = window.location.href.split("?");
-				if (querystring.length > 1) {
-					querystring = querystring[1].split("&");
-					var token = "";
-					var verifier = "";
-
-					for (var i = 0; i < querystring.length; i++) {
-						var keypair = querystring[i].split("=");
-						if (keypair[0].toLowerCase() == "oauth_verifier") {
-							verifier = keypair[1];
-						}
-
-						if (keypair[0].toLowerCase() == "oauth_token") {
-							token = keypair[1];
-						}
-					}
-					requestAccessToken(token, verifier);
-				}
-
-				SyntaxHighlighter.highlight();
+				loadData();
 				loadAuthPref();
-				toggleOAuthConnect();
 				toggleCurl();
+				toggleOAuthConnect();
+				SyntaxHighlighter.highlight();
 
 				// Load up all the API Calls
 				$.each(apiResources, function(key, val) {
 					$('#resources').append('<li><a class="resources" href="#" alt="' + key + '">' + key + '</a></li>');
 				});
 
+				/*
+				 * All our event handlers
+				 */
 				$('#sendRequest').click(function() {
 					makeServerRequest();
 					return false;
@@ -81,8 +68,7 @@
 						localStorage.authPref = "token";
 					}
 
-					var code = createRequest();
-					generateCurlCommand(code);
+					updateCodeDisplay();
 					loadAuthPref();
 					return false;
 				});
@@ -95,29 +81,54 @@
 					hideBox();
 				});
 
+				$('.authentication').live("keyup", function() {
+					saveData();
+					updateCodeDisplay();
+					toggleOAuthConnect();
+				});
+
+				$('a.resources').live("click", function() {
+					selectResource(this);
+				});
+
+				$('a.methods').live("click", function() {
+					selectMethod(this);
+				});
+
+				$('a.duplicate').live("click", function() {
+					var parent = $(this).parent();
+					var copyElement = $(this).siblings('div')[0];
+
+					$(parent).append(copyElement.outerHTML);
+				});
+
+				// Update the curl command on every text change
+				$('input.fields').live("keyup", function() {
+					updateCodeDisplay();
+				});
+
+				/*
+				 * All our key bindings
+				 */ 
 				$(document).bind('keydown', 'return', makeServerRequest);
 				$(document).bind('keydown', 'esc', hideBox);
-				$(document).bind('keydown', 'alt+ctrl+h', cyclePrevResource);
-				$(document).bind('keydown', 'alt+ctrl+l', cycleNextResource);
-				$(document).bind('keydown', 'alt+ctrl+j', cyclePrevMethod);
-				$(document).bind('keydown', 'alt+ctrl+k', cycleNextMethod);
+
+				$(document).bind('keydown', 'alt+ctrl+h', function() {
+					cycleAnchor('resources', 'prev');
+				});
+
+				$(document).bind('keydown', 'alt+ctrl+l', function() {
+					cycleAnchor('resources', 'next');
+				});
+
+				$(document).bind('keydown', 'alt+ctrl+j', function() {
+					cycleAnchor('methods', 'prev');
+				});
+
+				$(document).bind('keydown', 'alt+ctrl+k', function() {
+					cycleAnchor('methods', 'next');
+				});
 			});
-
-			function cyclePrevResource() {
-				cycleAnchor('resources', 'prev');
-			}
-
-			function cycleNextResource() {
-				cycleAnchor('resources', 'next');
-			}
-
-			function cyclePrevMethod() {
-				cycleAnchor('methods', 'prev');
-			}
-
-			function cycleNextMethod() {
-				cycleAnchor('methods', 'next');
-			}
 
 			function cycleAnchor(anchorClass, direction) {
 				var anchorsToCycle = $('a.' + anchorClass);
@@ -161,75 +172,6 @@
 				$('#box').hide();
 			}
 
-			function downloadFile(url, xml, authorization, contentType, fileType) {
-				var xhr = new XMLHttpRequest();
-				xhr.open('POST', url, true);
-				xhr.setRequestHeader('Authorization', authorization);
-				xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
-				xhr.responseType = 'arraybuffer';
-
-				xhr.onload = function(e) {
-					if (this.status == 200) {
-						var bb = new window.WebKitBlobBuilder();
-						bb.append(this.response);
-
-						var blob = bb.getBlob(contentType);
-						var blobURL = window.webkitURL.createObjectURL(blob);
-
-						if (contentType == 'application/pdf') {
-							window.open(blobURL);
-						} else {
-							$('#receipt').attr("src", blobURL);
-							$('#overlay').fadeIn('fast',function(){
-								$('#box').show();
-								$('#box').animate({'top':'160px'},500);
-							});
-						}
-
-					}
-					$('#loader').hide();
-					displayCode('response', "Download complete!");
-				};
-
-				xhr.send(xml);
-			}
-
-			$('.authentication').live("keyup", function() {
-				saveData();
-				var code = createRequest();
-				generateCurlCommand(code);
-				toggleOAuthConnect();
-			});
-
-			// Capture the API Call selection
-			$('a.resources').live("click", function() {
-				selectResource(this);
-				return false;
-			});
-
-			// Capture the Method Selection
-			$('a.methods').live("click", function() {
-				selectMethod(this);
-				return false;
-			});
-
-			// Capture the Method Selection
-			$('a.duplicate').live("click", function() {
-				parent = $(this).parent();
-				copyElement = $(this).siblings('div')[0];
-
-				$(parent).append(copyElement.outerHTML);
-
-				return false;
-			});
-
-			// Update the curl command on every text change
-			$('input.fields').live("keyup", function() {
-				var code = createRequest();
-				displayCode('request', code);
-				generateCurlCommand(code);
-			});
-
 			// Recursively traverses the json object building the html form
 			function exploreFields(root, level) {
 				var fields = "";
@@ -262,21 +204,21 @@
 			}
 
 			function selectResource(resource) {
-				formerElementName = currentElementName;
-				currentMethodName = "";
+				formerResource = currentResource;
+				currentMethod = "";
 
 				$('a.resources').removeClass("selected");
 				$(resource).addClass("selected");
 
 				//Get the selected element
-				currentElementName = $(resource).attr("alt");
-				currentElementMethods = apiResources[currentElementName];
+				currentResource = $(resource).attr("alt");
+				currentResourceMethods = apiResources[currentResource];
 
 				// Clear any methods/resources and add the new ones
 				$('#methods').html("");
 				$('#fields').html("");
 				var numMethods = 0;
-				$.each(currentElementMethods, function(key, val) {
+				$.each(currentResourceMethods, function(key, val) {
 					$('#methods').append('<li><a class="methods" href="#" alt="' + key + '">' + key + '</a></li>');
 					numMethods++;
 				});
@@ -294,7 +236,7 @@
 				var elementID = "";
 				var elementIDValue = "";
 
-				if (currentMethodName != 'create') {
+				if (currentMethod !== 'create') {
 					// extracttract the current id entered
 					$('input.fields').each(function() {
 						if ($(this).attr('alt').indexOf("_id") >= 0) {
@@ -308,22 +250,20 @@
 				$('a.methods').removeClass("selected");
 				$(method).addClass("selected");
 
-				formerMethodName = currentMethodName
-				currentMethodName = $(method).attr("alt");
+				formerMethod = currentMethod
+				currentMethod = $(method).attr("alt");
 
 				//Extract the fields from the selected method
-				$('#fields').html(exploreFields(currentElementMethods[currentMethodName], 0));
+				$('#fields').html(exploreFields(currentResourceMethods[currentMethod], 0));
 
-				$('#currentCurlCommand').html(currentElementName + '.' + currentMethodName);
+				$('#currentCurlCommand').html(currentResource + '.' + currentMethod);
 
-				var code = createRequest();
-				displayCode('request', code);
-				generateCurlCommand(code);
+				updateCodeDisplay();
 
 				$('#fields input:first').focus();
 
 				// Attempt to extract the newly created object id and auto-populate it anywhere its used
-				if (formerMethodName == 'create') {
+				if (formerMethod == 'create') {
 					var fieldName = "";
 					var newID = "";
 
@@ -355,12 +295,18 @@
 				}
 			}
 
+			function updateCodeDisplay() {
+				var code = createRequest();
+				displayCode('request', code);
+				generateCurlCommand(fb, code);
+			}
+
 			// Builds the curl command
 			function createRequest() {
 				var command = "";
 
-				if (currentElementName != "" && currentMethodName != "") {
-					command += '<request method="' + currentElementName + '.' + currentMethodName + '">';
+				if (currentResource !== "" && currentMethod !== "") {
+					command += '<request method="' + currentResource + '.' + currentMethod + '">';
 					command += parseFields($('#fields'), 1);
 					command += newLine + '</request>';
 				}
@@ -379,7 +325,7 @@
 					// fieldgroup divs contains the input
 					if ($(this).hasClass("fieldgroup")) {
 						var input = $("input", this)[0];
-						if ($(input).val() != "") {
+						if ($(input).val() !== "") {
 							xml += newLine + tabs(level) + '<' + $(input).attr("alt") + '>';
 							xml += $(input).val();
 							xml += '</' + $(input).attr("alt") + '>';
@@ -388,7 +334,7 @@
 					} else if ($(this).is("div")) {
 						tempParseResult = parseFields($(this), level + 1);
 
-						if (tempParseResult != "") {
+						if (tempParseResult !== "") {
 							xml += newLine + tabs(level) + '<' + $(this).attr("alt") + '>';
 							xml += '' + tempParseResult;
 							xml += newLine + tabs(level) + '</' + $(this).attr("alt") + '>';
@@ -409,234 +355,96 @@
 			}
 
 			function makeServerRequest() {
-				var apiURL = getResourceURL();
 				var xmlRequest = createRequest();
+				var transport = null;
 
-				if (apiURL == "") {
-					displayCode('response', "You have to provide a subdomain");
-					return;
-				}
-
-				if (xmlRequest == "") {
-					displayCode('response', "You have to select a call and method");
-					return;
-				}
-
-				var authorization = "";
-
-				// Validate requests
 				if (isTokenAuth()) {
-					var apiToken = getToken();
-
-					if (apiToken == "") {
-						displayCode('response', "You have to provide a token");
-						return;
-					}
-					authorization = make_base_auth(apiToken, 'X');
+					transport = new Token(fb);
 				} else {
-					var consumerKey = getConsumerKey();
-					var consumerKeySecret = getConsumerKeySecret();
-					var accessToken = getAccessToken();
-					var accessTokenSecret = getAccessTokenSecret();
+					transport = new OAuth(fb);
 
-					if (consumerKey == "") {
-						displayCode('response', "You have to provide a consumer key");
-						return;
-					}
+				}
 
-					if (accessToken == "") {
-						displayCode('response', "You have to provide an access token");
-						return;
-					}
-
-					if (accessTokenSecret == "") {
-						displayCode('response', "You have to provide an access token secret");
-						return;
-					}
-					authorization = getOAuthHeader(consumerKey, consumerKeySecret, accessToken, accessTokenSecret);
+				if (!transport.validate()) {
+					// TODO: display Error
+					return;
 				}
 
 				$('#response').hide();
 				$('#loader').show();
 
-				if (currentMethodName.toLowerCase() == 'getpdf') {
-					downloadFile(apiURL, xmlRequest, authorization, 'application/pdf');
+				var successFn = function(xhr, status) {
+					$('#loader').hide();
+					displayCode('response', xhr.target.responseText);
+				};
+
+				var errorFn = function() {
+					$('#loader').hide();
+					displayCode('response', "Unable to connect to server");
+				};
+
+				var contentType = "";
+				var responseType = "";
+
+				if (currentMethod.toLowerCase() == 'getpdf') {
+					contentType = "application/pdf";
+					responseType = "arraybuffer";
 					displayCode('response', 'PDF Downloading..');
-				} else if (currentElementName == 'receipt' && currentMethodName == 'get') {
-					downloadFile(apiURL, xmlRequest, authorization, 'image/xyz');
+
+					successFn = function(xhr) {
+						if (xhr.target.readyState==4 && xhr.target.status==200) {
+							var bb = new window.WebKitBlobBuilder();
+							bb.append(this.response);
+
+							var blob = bb.getBlob(contentType);
+							var blobURL = window.webkitURL.createObjectURL(blob);
+							window.open(blobURL);
+						}
+						$('#loader').hide();
+						displayCode('response', "Download complete!");
+					};
+
+				} else if (currentResource == 'receipt' && currentMethod == 'get') {
+					contentType = "image/xyz";
+					responseType = "arraybuffer";
 					displayCode('response', 'Image Downloading..');
-				} else {
-					$.ajax({
-						type: "POST",
-						url: apiURL,
-						async: true,
-						data: xmlRequest,
-						headers: {
-									'FB-User-Agent': "FreshBooks API Playground",
-									'Authorization': authorization,
-									'content-type': 'application/x-www-form-urlencoded'
-								 },
-						dataType: "arraybuffer",
-						complete: function(xhr, status) {
-							$('#loader').hide();
-							if (status != 'error') {
-								displayCode('response', xhr.responseText);
-							}
-						},
-						error: function() {
-							$('#loader').hide();
-							displayCode('response', "Unable to connect to server");
+
+					successFn = function(xhr) {
+						if (xhr.target.readyState==4 && xhr.target.status==200) {
+							var bb = new window.WebKitBlobBuilder();
+							bb.append(this.response);
+
+							var blob = bb.getBlob(contentType);
+							var blobURL = window.webkitURL.createObjectURL(blob);
+
+							$('#receipt').attr("src", blobURL);
+							$('#overlay').fadeIn('fast',function(){
+								$('#box').show();
+								$('#box').animate({'top':'160px'},500);
+							});
 						}
-					});
+						$('#loader').hide();
+						displayCode('response', "Download complete!");
+					};
 				}
+
+				transport.makeAPIRequest(xmlRequest, successFn, errorFn, contentType, responseType);
 			}
 
-			function getOAuthRequestToken() {
-				var url = getRequestTokenURI();
-				var consumerKey = getConsumerKey();
-				var consumerKeySecret = getConsumerKeySecret();
+			function generateCurlCommand(freshbooks, code) {
+				var apiURL = freshbooks.getResourceURL();
+				var command = "";
 
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
-					return;
-				}
-
-				if (url == "") {
-					displayCode('response', "You have to provide a subdomain");
-					return;
-				}
-
-				$.ajax({
-					type: "POST",
-					url: getRequestTokenURI(),
-					async: true,
-					dataType: "xml",
-					headers: {
-								'FB-User-Agent': "FreshBooks API Playground",
-								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, "", "", getExtensionURL(), ""),
-								'content-type': 'application/x-www-form-urlencoded'
-							 },
-					complete: function(xhr, status) {
-						// search for oauth_token
-						var parameters = xhr.responseText.split("&");
-						for (var i = 0; i < parameters.length; i++) {
-							var keypair = parameters[i].split("=");
-							if (keypair[0].toLowerCase() == "oauth_token") {
-								chrome.tabs.create({
-										url:getAuthorizeTokenURI(keypair[1])
-								});
-
-								chrome.tabs.getCurrent(function(tab) {
-									chrome.tabs.remove(tab.id);
-								});
-							}
-						}
-					},
-					error: function(xhr) {
-						displayCode('response', xhr.responseText);
-					}
-				});
-			}
-
-			function requestAccessToken(token, verifier) {
-				var consumerKey = getConsumerKey();
-				var consumerKeySecret = getConsumerKeySecret();
-
-				if (consumerKey == "") {
-					displayCode('response', "You have to provide a consumer key");
-					return;
-				}
-
-				if (consumerKeySecret == "") {
-					displayCode('response', "You have to provide a consumer key secret");
-					return;
-				}
-
-				$('#response').hide();
-
-				$.ajax({
-					type: "POST",
-					url: getAccessTokenURI(),
-					async: true,
-					dataType: "xml",
-					headers: {
-								'FB-User-Agent': "FreshBooks API Playground",
-								'Authorization': getOAuthHeader(consumerKey, consumerKeySecret, token, "", getExtensionURL(), verifier),
-								'content-type': 'application/x-www-form-urlencoded'
-							 },
-					complete: function(xhr, status) {
-						// search for access_token and access_token_secret
-						var parameters = xhr.responseText.split("&");
-						for (var i = 0; i < parameters.length; i++) {
-							var keypair = parameters[i].split("=");
-							if (keypair[0].toLowerCase() == "oauth_token") {
-								localStorage.accesstoken = keypair[1];
-							}
-
-							if (keypair[0].toLowerCase() == "oauth_token_secret") {
-								localStorage.accesstokensecret = keypair[1];
-							}
-						}
-						loadData();
-						window.location = getExtensionURL();
-					},
-					error: function(xhr) {
-						displayCode('response', xhr.responseText);
-					}
-				});
-			}
-
-			function getOAuthHeader(consumer, consumersecret, token, tokensecret, callback, verifier) {
-
-				var header = 'OAuth realm="",oauth_version="1.0",oauth_consumer_key="' + consumer +'",oauth_timestamp="'+ getTimestamp() +'",oauth_nonce="'+ getNonce() +'",oauth_signature_method="PLAINTEXT"';
-
-				// Add the consumer secret and access token secret
-				header += ',oauth_signature="' + consumersecret + '%2526';
-				if (tokensecret != "") {
-					header += tokensecret;
-				}
-				header += '"';
-
-				// Adding the token
-				if (token != "") {
-					header += ',oauth_token="'+ token + '"';
-				}
-
-				// Callback for getting a request token
-				if (callback != "") {
-					header += ',oauth_callback="'+ callback + '"';
-				}
-
-				// Verifier for getting access tokens
-				if (verifier != "") {
-					header += ',oauth_verifier="'+ verifier + '"';
-				}
-
-				return header;
-			}
-
-			function generateCurlCommand(code) {
-				var apiURL = getResourceURL();
-
-				if (code != "" && apiURL != "") {
+				if (code !== "" && apiURL !== "") {
 					if (isTokenAuth()) {
-						var apiToken = getToken();
-						if (apiToken != "") {
-							var command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
-							$('#curlCommand').html(command);
-						}
+						var apiToken = freshbooks.token;
+						command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
 					} else {
-						var consumerkey = getConsumerKey();
-						var consumersecret = getConsumerKeySecret();
-						var accesstoken = getAccessToken();
-						var accesstokensecret = getAccessTokenSecret();
-
-						if (consumerkey != "" && consumersecret != "" && accesstoken != "" && accesstokensecret != "") {
-							var command = "curl -k -H 'Authorization : " + getOAuthHeader(consumerkey, consumersecret, accesstoken, accesstokensecret, "", "") + "' " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
-							$('#curlCommand').html(command);
-						}
+						var oauth = new OAuth(fb);
+						command = "curl -k -H 'Authorization : " + oauth.getAuthorization() + "' " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
 					}
 				}
+				$('#curlCommand').html(command);
 			}
 
 			function displayCode(sectionID, code) {
@@ -650,10 +458,23 @@
 				SyntaxHighlighter.highlight();
 			}
 
-			function make_base_auth(user, password) {
-				var tok = user + ':' + password;
-				var hash = window.btoa(tok);
-				return "Basic " + hash;
+			function saveData() {
+				fb.subdomain =         $('#apiURL').val().trim();
+				fb.token =             $('#apiToken').val().trim();
+				fb.consumerKey =       $('#consumerKey').val().trim();
+				fb.consumerSecret =    $('#consumerSecret').val().trim();
+				fb.accessToken =       $('#accessToken').val().trim();
+				fb.accessTokenSecret = $('#accessTokenSecret').val().trim();
+				fb.save();
+			}
+
+			function loadData() {
+				$('#apiURL').val(fb.subdomain);
+				$('#apiToken').val(fb.token);
+				$('#consumerKey').val(fb.consumerKey);
+				$('#consumerSecret').val(fb.consumerSecret);
+				$('#accessToken').val(fb.accessToken);
+				$('#accessTokenSecret').val(fb.accessTokenSecret);
 			}
 
 			function loadAuthPref() {
@@ -669,7 +490,7 @@
 			}
 
 			function toggleOAuthConnect() {
-				if (getAccessToken() == "" && getAccessTokenSecret() == "") {
+				if (fb.accessToken == "" && fb.accessTokenSecret == "") {
 					$('#connect').show();
 				} else {
 					$('#connect').hide();
@@ -690,131 +511,113 @@
 				return localStorage.authPref == "token";
 			}
 
-			function resetData() {
-				localStorage.showcurl = "false";
-				localStorage.authPref = "token";
-				localStorage.subdomain = "";
-				localStorage.apikey = "";
-				localStorage.consumerkey = "";
-				localStorage.consumersecret = "";
-				localStorage.accesstoken = "";
-				localStorage.accesstokensecret = "";
-			}
-
-			function saveData() {
-				var url = $('#apiURL').val().trim();
-				var hostname = url.match("(https|http)?(://)?([a-zA-Z0-9\.]*)?(/.*)?");
-
-				// Only save if we find a subdomain value
-				if (hostname[3]) {
-					// If only a subdomain is provided, we automatically append '.freshbooks.com'
-					subdomain = hostname[3];
-					if (subdomain.indexOf(".") < 0) {
-						subdomain = subdomain + ".freshbooks.com";
-					}
-					localStorage.subdomain = subdomain;
-				} else {
-					localStorage.subdomain = "";
-				}
-
-				localStorage.apikey = $('#apiToken').val().trim();
-				localStorage.consumerkey = $('#consumerKey').val().trim();
-				localStorage.consumersecret = $('#consumerSecret').val().trim();
-				localStorage.accesstoken = $('#accessToken').val().trim();
-				localStorage.accesstokensecret = $('#accessTokenSecret').val().trim();
-			}
-
-			function loadData() {
-				$('#apiURL').val(localStorage.subdomain);
-				$('#apiToken').val(localStorage.apikey);
-				$('#consumerKey').val(localStorage.consumerkey);
-				$('#consumerSecret').val(localStorage.consumersecret);
-				$('#accessToken').val(localStorage.accesstoken);
-				$('#accessTokenSecret').val(localStorage.accesstokensecret);
-			}
-
-			function getConsumerKey() {
-				return localStorage.consumerkey;
-			}
-
-			function getConsumerKeySecret() {
-				return localStorage.consumersecret;
-			}
-
-			function getAccessToken() {
-				return localStorage.accesstoken;
-			}
-
-			function getAccessTokenSecret() {
-				return localStorage.accesstokensecret;
-			}
-
-			function getSubdomain() {
-				return localStorage.subdomain;
-			}
-
 			function getExtensionURL() {
 				var url = document.URL.split("?");
 				url = url[0];
 				return url.replace("#", "");
 			}
 
-			function getResourceURL() {
-				var subdomain = getSubdomain();
-				if (subdomain != "") {
-					subdomain = 'https://' + subdomain + '/api/2.1/xml-in';
+			/*
+			 * Methods for handling the OAuth Dance
+			 */
+			function detectOAuthCallbackAttempt() {
+				// Look for verifiers
+				var querystring = window.location.href.split("?");
+				if (querystring.length > 1) {
+					querystring = querystring[1].split("&");
+					var token = "";
+					var verifier = "";
+
+					for (var i = 0; i < querystring.length; i++) {
+						var keypair = querystring[i].split("=");
+						if (keypair[0].toLowerCase() == "oauth_verifier") {
+							verifier = keypair[1];
+						}
+
+						if (keypair[0].toLowerCase() == "oauth_token") {
+							token = keypair[1];
+						}
+					}
+					requestAccessToken(fb, token, verifier);
+				}
+			}
+
+			function getOAuthRequestToken() {
+				var xmlRequest = createRequest();
+				var transport = new OAuthRequestToken(fb, getExtensionURL());
+
+				if (!transport.validate()) {
+					// TODO: display Error
+					return;
 				}
 
-				return subdomain
+				$('#response').hide();
+				$('#loader').show();
+
+				var successFn = function(xhr, status) {
+					if (xhr.target.readyState==4 && xhr.target.status==200) {
+						// search for oauth_token
+						var parameters = xhr.target.responseText.split("&");
+						for (var i = 0; i < parameters.length; i++) {
+							var keypair = parameters[i].split("=");
+							if (keypair[0].toLowerCase() == "oauth_token") {
+								chrome.tabs.create({
+									url:fb.getAuthorizeTokenURI(keypair[1])
+								});
+
+								chrome.tabs.getCurrent(function(tab) {
+									chrome.tabs.remove(tab.id);
+								});
+							}
+						}
+					}
+				};
+
+				var errorFn = function() {
+					$('#loader').hide();
+					displayCode('response', xhr.target.responseText);
+				};
+
+				transport.makeAPIRequest(xmlRequest, successFn, errorFn, "", "");
 			}
 
-			function getRequestTokenURI() {
-				var subdomain = getSubdomain();
-				if (subdomain != "") {
-					subdomain = 'https://' + subdomain + '/oauth/oauth_request.php';
+			function requestAccessToken(token, verifier) {
+				var xmlRequest = createRequest();
+				var transport = new OAuthAccessToken(fb, "/", token, verifier);
+
+				if (!transport.validate()) {
+					// TODO: display Error
+					return;
 				}
 
-				return subdomain
-			}
+				$('#response').hide();
+				$('#loader').show();
 
-			function getAuthorizeTokenURI(token) {
-				var subdomain = getSubdomain();
-				if (subdomain != "") {
-					subdomain = 'https://' + subdomain + '/oauth/oauth_authorize.php?oauth_token=' + token;
-				}
+				var successFn = function(xhr, status) {
+					if (xhr.target.readyState==4 && xhr.target.status==200) {
+						// search for access_token and access_token_secret
+						var parameters = xhr.target.responseText.split("&");
+						for (var i = 0; i < parameters.length; i++) {
+							var keypair = parameters[i].split("=");
+							if (keypair[0].toLowerCase() == "oauth_token") {
+								fb.accessToken = keypair[1];
+							}
 
-				return subdomain
-			}
+							if (keypair[0].toLowerCase() == "oauth_token_secret") {
+								fb.accessTokenSecret = keypair[1];
+							}
+						}
+						fb.save();
+					}
+					window.location = getExtensionURL();
+				};
 
-			function getAccessTokenURI() {
-				var subdomain = getSubdomain();
-				if (subdomain != "") {
-					subdomain = 'https://' + subdomain + '/oauth/oauth_access.php';
-				}
+				var errorFn = function() {
+					$('#loader').hide();
+					displayCode('response', xhr.target.responseText);
+				};
 
-				return subdomain
-			}
-
-			function getToken() {
-				return localStorage.apikey;
-			}
-
-			// From Netflix's oauth implementation
-			function getTimestamp() {
-				var t = (new Date()).getTime();
-				return Math.floor(t / 1000);
-			}
-
-			// From Netflix's oauth implementation
-			function getNonce() {
-				var nonceLength = 15;
-				var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-				var result = "";
-				for (var i = 0; i < nonceLength; ++i) {
-				var rnum = Math.floor(Math.random() * chars.length);
-					result += chars.substring(rnum, rnum+1);
-				}
-				return result;
+				transport.makeAPIRequest(xmlRequest, successFn, errorFn, "", "");
 			}
 		</script>
 	</head>
