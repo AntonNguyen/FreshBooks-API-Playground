@@ -506,6 +506,9 @@ var apiResources = {
 		"getProfitDetails": [
 			"client_id", "date_from", "date_to", "group_by"
 		],
+		"getClientDetails": [
+			"client_id"
+		],
 	},
 
 	"staff":{
