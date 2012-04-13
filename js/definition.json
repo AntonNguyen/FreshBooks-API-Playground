@@ -138,7 +138,7 @@ var apiResources = {
 			"page", "per_page", "client_id", "date_from", "date_to", "folder", "order"
 		],
 		"sendByEmail":[
-			"estimate_id"
+			"estimate_id", "subject", "message"
 		],
 		"getPDF":[
 			"estimate_id"
@@ -264,10 +264,10 @@ var apiResources = {
 			"invoice_id"
 		],
 		"sendByEmail":[
-			"invoice_id"
+			"invoice_id", "subject", "message"
 		],
 		"sendBySnailMail":[
-			"invoice_id"
+			"invoice_id", "subject", "message"
 		],
 		"generate":[
 			"client_id", "date_from", "date_to", "time_entry_format", "include_expenses",
