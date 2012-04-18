@@ -521,6 +521,7 @@
 			 * Methods for handling the OAuth Dance
 			 */
 			function detectOAuthCallbackAttempt() {
+
 				// Look for verifiers
 				var querystring = window.location.href.split("?");
 				if (querystring.length > 1) {
@@ -538,7 +539,8 @@
 							token = keypair[1];
 						}
 					}
-					requestAccessToken(fb, token, verifier);
+
+					requestAccessToken(token, verifier);
 				}
 			}
 

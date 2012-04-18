@@ -1,0 +1,18 @@
+What Should Be Sent to FreshBooks
+================
+multipart posting
+--END_OF_PART
+Content-type: application/xml; charset=utf-8
+
+[XML]
+--END_OF_PART
+Content-Type: [CONTENT-TYPE]
+Content-Disposition: attachment; filename=[FILENAME]
+Content-ID: [CONTENT-ID]
+
+[FILE-CONTENT]
+
+--END_OF_PART
+
+================
+multipart/related; boundary=END_OF_PART
