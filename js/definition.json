@@ -39,7 +39,7 @@ var apiResources = {
 			"category_id"
 		],
 		"list":[
-			"page", "per_page", "order"
+			"page", "per_page", "order", "parent_id"
 		]
 	},
 
