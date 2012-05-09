@@ -83,6 +83,38 @@ var apiResources = {
 		]
 	},
 
+	"contractor":{
+		"create":[
+			{"contractor":[
+				"name", "email", "rate", "task_id",
+				{"projects":[
+					{"project":[
+						"project_id"
+					]}
+				]}
+			]}
+		],
+		"update":[
+			{"contractor":[
+				"contractor_id", "name", "email", "rate", "task_id",
+				{"projects":[
+					{"project":[
+						"project_id"
+					]}
+				]}
+			]}
+		],
+		"get":[
+			"contractor_id"
+		],
+		"list":[
+			"page", "per_page"
+		],
+		"delete":[
+			"contractor_id"
+		],
+	},
+
 	"currency":{
 		"list":[
 			"page", "per_page"
@@ -521,20 +553,51 @@ var apiResources = {
 		]
 	},
 
+	"session":{
+		"create":[
+			{"session":[
+				"target"
+			]}
+		]
+	},
+
 	"system":{
 		"current":[],
 		"create":[
 			{"system":[
-				"name", "email", "username", "password", "first_name", "last_name", "street1", "street2",
-				"city", "province", "postal_code", "country", "profession", "currency_code", "work_phone",
-				"terms"
+				"name", 
+				"email", 
+				"username", 
+				"password", 
+				"first_name", 
+				"last_name", 
+				{"address" : [
+					"street_1", "street_2", "city", "province", "country", "postal_code"
+				]},
+				"profession", "currency_code", "work_phone",
+				"terms",
+				{"notifications" : [
+					"late_payment_reminder_1", "late_payment_reminder_2", "late_payment_reminder_3",
+				]}
 			]}
 		],
 		"getRecentActivity":[],
 		"update":[
 			{"system":[
-				"name", "email", "username", "password", "first_name", "last_name", "street1", "street2",
-				"city", "province", "postal_code", "country", "profession", "currency_code", "work_phone"
+				"name", 
+				"email", 
+				"username", 
+				"password", 
+				"first_name", 
+				"last_name", 
+				{"address" : [
+					"street_1", "street_2", "city", "province", "country", "postal_code"
+				]},
+				"profession", "currency_code", "work_phone",
+				"terms",
+				{"notifications" : [
+					"late_payment_reminder_1", "late_payment_reminder_2", "late_payment_reminder_3",
+				]}
 			]}
 		]
 	},
