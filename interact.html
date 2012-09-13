@@ -1,10 +1,10 @@
 <html>
 	<head>
 		<title>FreshBooks API Playground</title>
+
 		<link rel="stylesheet" href="css/reset.css" type="text/css" />
 		<link rel="stylesheet" href="css/style.css" type="text/css" />
-		<link rel="stylesheet" href="css/shCore.css" type="text/css" />
-		<link rel="stylesheet" href="css/shThemeDefault.css" type="text/css" />
+		<link rel="stylesheet" href="css/vs.css" type="text/css">
 		<script type="text/javascript" src="js/jquery.js"></script>
 		<script type="text/javascript" src="js/jquery.hotkeys-0.7.9.min.js"></script>
 		<script type="text/javascript" src="js/Class.js"></script>
@@ -14,8 +14,7 @@
 		<script type="text/javascript" src="js/OAuth.js"></script>
 		<script type="text/javascript" src="js/OAuthRequestToken.js"></script>
 		<script type="text/javascript" src="js/OAuthAccessToken.js"></script>
-		<script type="text/javascript" src="js/shCore.js"></script>
-		<script type="text/javascript" src="js/shBrushXml.js"></script>
+		<script type="text/javascript" src="js/highlight.pack.js"></script>
 		<script type="text/javascript" src="js/definition.json"></script>
 		<script type="text/javascript">
 			var newLine = '\r\n';
@@ -35,7 +34,7 @@
 				loadAuthPref();
 				toggleCurl();
 				toggleOAuthConnect();
-				SyntaxHighlighter.highlight();
+				hljs.initHighlightingOnLoad();
 
 				// Load up all the API Calls
 				$.each(apiResources, function(key, val) {
@@ -448,14 +447,13 @@
 			}
 
 			function displayCode(sectionID, code) {
-				var sectionJQ = "#" + sectionID;
-				var parent = $(sectionJQ).parent();
+				var sectionJQ = "#" + sectionID + ' code';
+				var highlightedCode = hljs.highlight('xml', code);
+				$(sectionJQ).html(highlightedCode.value);
 
-				$(sectionJQ).remove();
-				$(parent).append('<pre id="' + sectionID + '" class="brush: xml; toolbar: false; auto-links:false;"></pre>');
-				$(sectionJQ).append(code);
+				$('#' + sectionID).show();
+			}
 
-				SyntaxHighlighter.highlight();
 			}
 
 			function saveData() {
@@ -674,7 +672,7 @@
 				<hr/>
 				<textarea id="curlCommand" rows="1" wrap="off"></textarea>
 				<div>
-					<pre id="request" class="brush: xml; toolbar: false; auto-links:false;"></pre>
+					<pre id="request"><code class="xml"></code></pre>
 				</div>
 				<a href="#" id="sendRequest" accesskey="S">Send Request</a>
 			</div>
@@ -686,7 +684,7 @@
 					<img src="media/ajax-loader.gif"/><br/>
 					<p>Shhh! I&apos;m thinking!</p>
 				</div>
-				<pre id="response" class="brush: xml; toolbar: false; auto-links:false;"></pre>
+				<pre id="response"><code class="xml"></code></pre>
 			</div>
 		</div>
 		<div id="overlay" class="overlay" style="display:none"></div>
