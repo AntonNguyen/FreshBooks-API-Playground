@@ -451,14 +451,12 @@
 				var apiURL = freshbooks.getResourceURL();
 				var command = "";
 
-				if (code !== "" && apiURL !== "") {
-					if (isTokenAuth()) {
-						var apiToken = freshbooks.token;
-						command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
-					} else {
-						var oauth = new OAuth(fb);
-						command = "curl -k -H 'Authorization : " + oauth.getAuthorization() + "' " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
-					}
+				if (isTokenAuth()) {
+					var apiToken = freshbooks.token;
+					command = "curl -k -u " + apiToken + ":X " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
+				} else {
+					var oauth = new OAuth(fb);
+					command = "curl -k -H 'Authorization : " + oauth.getAuthorization() + "' " + apiURL + " -d '" + code.replace(/[\n\r\t]/g, '') + "'";
 				}
 				$('#curlCommand').html(command);
 			}
