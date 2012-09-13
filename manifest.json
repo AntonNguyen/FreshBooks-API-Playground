@@ -1,18 +1,28 @@
 {
+	"manifest_version": 2,
 	"name": "FreshBooks API Playground",
-	"version": "2.14",
+	"version": "3.0",
 	"description": "Easily interact and experiment with the FreshBooks API!",
 	"icons": {"16": "media/leaf.png", "48": "media/leaf.png", "128": "media/leaf.png"},
 	"permissions": ["tabs",
-					"https://*.freshbooks.com/api/2.1/xml-in",
+					"storage",
 					"https://*.trunk.2ndsiteinc.com/api/2.1/xml-in",
 					"https://*.rc.2ndsiteinc.com/api/2.1/xml-in",
 					"https://*.last-release.2ndsiteinc.com/api/2.1/xml-in",
-					"https://*.freshbooksdev.com/api/2.1/xml-in"],
+					"https://*.selenium.2ndsiteinc.com/api/2.1/xml-in",
+					"https://*.freshbooksdev.com/api/2.1/xml-in",
+					"https://*.freshbooksapi.com/api/2.1/xml-in"],
 	"update_url": "http://afn85.webfactional.com/updates.xml",
 	"browser_action": {
 		"default_title": "FreshBooks",
-		"default_icon": "media/leaf.png",
-		"popup": "popup.html"
+		"default_icon": "media/leaf.png"
+	},
+	"background": {
+		"scripts": ["background.js"]
+	},
+	"sandbox": {
+		"pages": [
+			"interact.html"
+		],
 	}
 }
