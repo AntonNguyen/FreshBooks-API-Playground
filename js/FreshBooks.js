@@ -19,7 +19,7 @@ var FreshBooks = Class.extend({
 	},
 
 	save: function() {
-		var hostname = this.subdomain.match("(https|http)?(://)?([a-zA-Z0-9\.]*)?(/.*)?");
+		var hostname = this.subdomain.match("(https|http)?(://)?([a-zA-Z0-9\.\-]*)?(/.*)?");
 
 		// Only save if we find a subdomain value
 		if (hostname[3]) {
