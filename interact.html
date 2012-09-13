@@ -50,10 +50,10 @@
 				});
 
 				$('#curl').click(function() {
-					if (localStorage.showcurl == "false") {
-						localStorage.showcurl = "true";
+					if (localStorage['showcurl'] == "false") {
+						localStorage['showcurl'] = "true";
 					} else {
-						localStorage.showcurl = "false";
+						localStorage['showcurl'] = "false";
 					}
 
 					toggleCurl();
@@ -61,10 +61,10 @@
 				});
 
 				$('#switch').click(function() {
-					if (localStorage.authPref == "token") {
-						localStorage.authPref = "oauth";
+					if (localStorage['authPref'] == "token") {
+						localStorage['authPref'] = "oauth";
 					} else {
-						localStorage.authPref = "token";
+						localStorage['authPref'] = "token";
 					}
 
 					updateCodeDisplay();
@@ -476,7 +476,7 @@
 			}
 
 			function loadAuthPref() {
-				if (localStorage.authPref == "token") {
+				if (localStorage['authPref'] == "token") {
 					$('#authTitle').text("Token User");
 					$('#oauthCredentials').hide();
 					$('#tokenCredentials').show();
@@ -496,7 +496,7 @@
 			}
 
 			function toggleCurl() {
-				if (localStorage.showcurl == "false") {
+				if (localStorage['showcurl'] == "false") {
 					$('#curl').text("Show Curl Request");
 					$('#curlCommand').hide();
 				} else {
@@ -506,7 +506,7 @@
 			}
 
 			function isTokenAuth() {
-				return localStorage.authPref == "token";
+				return localStorage['authPref'] == "token";
 			}
 
 			function getExtensionURL() {

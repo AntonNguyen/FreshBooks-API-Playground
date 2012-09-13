@@ -1,7 +1,7 @@
 var FreshBooks = Class.extend({
 	init: function() {
-		if (!localStorage.isInitialized) {
-			localStorage.isInitialized = true;
+		if (!localStorage['isInitialized']) {
+			localStorage['isInitialized'] = true;
 			this.reset();
 		} else {
 			this.load();
@@ -9,13 +9,13 @@ var FreshBooks = Class.extend({
 	},
 
 	load: function() {
-		this.subdomain = localStorage.subdomain;
-		this.apiKey = localStorage.apiKey;
-		this.token = localStorage.token;
-		this.consumerKey = localStorage.consumerKey;
-		this.consumerSecret = localStorage.consumerSecret;
-		this.accessToken = localStorage.accessToken;
-		this.accessTokenSecret = localStorage.accessTokenSecret;
+		this.subdomain = localStorage['subdomain'];
+		this.apiKey = localStorage['apiKey'];
+		this.token = localStorage['token'];
+		this.consumerKey = localStorage['consumerKey'];
+		this.consumerSecret = localStorage['consumerSecret'];
+		this.accessToken = localStorage['accessToken'];
+		this.accessTokenSecret = localStorage['accessTokenSecret'];
 	},
 
 	save: function() {
@@ -28,17 +28,17 @@ var FreshBooks = Class.extend({
 			if (this.subdomain.indexOf(".") < 0) {
 				this.subdomain = this.subdomain + ".freshbooks.com";
 			}
-			localStorage.subdomain = this.subdomain;
+			localStorage['subdomain'] = this.subdomain;
 		} else {
-			localStorage.subdomain = "";
+			localStorage['subdomain'] = "";
 		}
 
-		localStorage.apiKey = this.apiKey;
-		localStorage.token = this.token;
-		localStorage.consumerKey = this.consumerKey;
-		localStorage.consumerSecret = this.consumerSecret;
-		localStorage.accessToken = this.accessToken;
-		localStorage.accessTokenSecret = this.accessTokenSecret;
+		localStorage['apiKey'] = this.apiKey;
+		localStorage['token'] = this.token;
+		localStorage['consumerKey'] = this.consumerKey;
+		localStorage['consumerSecret'] = this.consumerSecret;
+		localStorage['accessToken'] = this.accessToken;
+		localStorage['accessTokenSecret'] = this.accessTokenSecret;
 	},
 
 	reset: function() {
