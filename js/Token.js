@@ -9,7 +9,7 @@ var Token = Transport.extend({
 	},
 
 	getAuthorization: function() {
-		return this.makeBaseAuth(this.freshbooks.token, 'X');;
+		return this.makeBaseAuth(this.freshbooks.token, 'X');
 	},
 
 	makeBaseAuth: function(username, password) {

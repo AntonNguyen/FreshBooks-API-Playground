@@ -6,10 +6,7 @@ var OAuth = Transport.extend({
 
 	getRequiredFields: function() {
 		return [this.url, 
-				this.freshbooks.consumerKey,
-				this.freshbooks.consumerKeySecret,
-				this.freshbooks.accessToken,
-				this.freshbooks.accessTokenSecret];
+				this.freshbooks.consumerKey];
 	},
 
 	getAuthorization: function() {
