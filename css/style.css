@@ -23,14 +23,29 @@ h2 {
     color: #0d83dd;
 }
 
-.syntaxhighlighter, textarea, input {
+pre code {
+    background-color:#ffffff;
+    width: 619px;
+    margin: 0 auto;
+}
+
+textarea, input, pre code {
     -webkit-border-radius:3px;
     border: 1px solid #CCC;
 }
 
-.syntaxhighlighter, textarea {
+textarea {
     width: 623px;
     margin:15px 0px 7px 7px;
+}
+
+label.include {
+    color:#AAFF1E;
+    font-weight:bold;
+}
+
+label:hover {
+    cursor: pointer;
 }
 
 #header {
@@ -76,7 +91,7 @@ h2 {
 
 
 .input_grouping hr {
-    border-bottom: 1px solid #fff;
+    border: 1px solid #fff;
 }
 
 #content {
