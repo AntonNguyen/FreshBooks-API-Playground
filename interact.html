@@ -106,9 +106,20 @@
 					updateCodeDisplay();
 				});
 
+				// Add an empty xml tag
+				$('label').live("click", function() {
+					if ($(this).hasClass('include')) {
+						$(this).removeClass("include");
+					} else {
+						$(this).addClass("include");
+					}
+
+					updateCodeDisplay();
+				});
+
 				/*
 				 * All our key bindings
-				 */ 
+				 */
 				$(document).bind('keydown', 'return', makeServerRequest);
 				$(document).bind('keydown', 'esc', hideBox);
 
