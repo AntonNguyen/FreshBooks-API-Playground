@@ -385,7 +385,13 @@
 
 				var successFn = function(xhr, status) {
 					$('#loader').hide();
-					displayCode('response', xhr.target.responseText);
+					if (xhr.target.status==200) {
+						displayCode('response', xhr.target.responseText);
+					} else if (xhr.target.status==401) {
+						displayCode('response', "Authorization failed");
+					} else {
+						displayCode('response', "Unable to connect to server");
+					}
 				};
 
 				var errorFn = function() {
