@@ -335,10 +335,18 @@
 					// fieldgroup divs contains the input
 					if ($(this).hasClass("fieldgroup")) {
 						var input = $("input", this)[0];
+						var label = $("label", this)[0];
+
 						if ($(input).val() !== "") {
 							xml += newLine + tabs(level) + '<' + $(input).attr("alt") + '>';
 							xml += $(input).val();
 							xml += '</' + $(input).attr("alt") + '>';
+							$(label).removeClass("include");
+						} else {
+							if ($(label).hasClass("include")) {
+								xml += newLine + tabs(level) + '<' + $(input).attr("alt") + '>';
+								xml += '</' + $(input).attr("alt") + '>';
+							}
 						}
 					// All other divs contains a subgrouping
 					} else if ($(this).is("div")) {
