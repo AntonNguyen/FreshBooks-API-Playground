@@ -6,8 +6,20 @@ var formerResource = "";
 var currentMethod = "";
 var formerMethod = "";
 var fb = null;
+var apiResources;
 
 $(document).ready(function() {
+	$.ajax({
+		url: '/js/definition.json',
+		dataType: 'json',
+		success: function(json) {
+			apiResources = json;
+			startUp();
+		}
+	});
+});
+
+function startUp() {
 	fb = new FreshBooks();
 	detectOAuthCallbackAttempt();
 
@@ -119,7 +131,7 @@ $(document).ready(function() {
 	$(document).bind('keydown', 'alt+ctrl+k', function() {
 		cycleAnchor('methods', 'next');
 	});
-});
+};
 
 function cycleAnchor(anchorClass, direction) {
 	var anchorsToCycle = $('a.' + anchorClass);

@@ -1,713 +1,1429 @@
-var apiResources = {
-	"callback":{
-		"create":[
-			{"callback":[
-				"event", "uri"
-			]}
-		],
-		"verify":[
-			{"callback":[
-				"callback_id","verifier"
-			]}
-		],
-		"resendToken":[
-			"callback_id"
-		],
-		"list":[
-			"page", "per_page", "event", "uri"
-		],
-		"delete":[
-			"callback_id"
-		]
-	},
-
-	"category":{
-		"create":[
-			{"category":[
-				"name"
-			]}
-		],
-		"update":[
-			{"category":
-				["category_id", "name"]
-			}
-		],
-		"get":[
-			"category_id"
-		],
-		"delete":[
-			"category_id"
-		],
-		"list":[
-			"page", "per_page", "order", "parent_id"
-		]
-	},
-
-	"client":{
-		"create":[
-			{"client":[
-				"first_name", "last_name", "organization", "email", "username", "password",
-				"work_phone", "home_phone", "mobile", "fax",
-				{"contacts":[
-					{"contact":[
-						"first_name", "last_name", "email", "username", "password", "phone1","phone2"
-					]}
-				]},
-				"language", "currency_code", "notes", "p_street1", "p_street2", "p_city",
-				"p_state", "p_country", "p_code", "s_street1", "s_street2", "s_city", "s_state",
-				"s_country", "s_code", "vat_name", "vat_number"
-			]}
-		],
-		"update":[
-			{"client":[
-				"client_id", "first_name", "last_name", "organization", "email", "username", "password",
-				"work_phone", "home_phone", "mobile", "fax",
-				{"contacts":[
-					{"contact":[
-						"contact_id", "first_name", "last_name", "email", "username", "password", "phone1","phone2"
-					]}
-				]},
-				"language", "currency_code", "notes", "p_street1", "p_street2", "p_city",
-				"p_state", "p_country", "p_code", "s_street1", "s_street2", "s_city", "s_state",
-				"s_country", "s_code", "vat_name", "vat_number"
-			]}
-		],
-		"get":[
-			"client_id"
-		],
-		"delete":[
-			"client_id"
-		],
-		"list":[
-			"page", "per_page", "email", "username", "updated_from", "update_to", "folder", "notes", "order"
-		]
-	},
-
-	"contractor":{
-		"create":[
-			{"contractor":[
-				"name", "email", "rate", "task_id",
-				{"projects":[
-					{"project":[
-						"project_id"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"contractor":[
-				"contractor_id", "name", "email", "rate", "task_id",
-				{"projects":[
-					{"project":[
-						"project_id"
-					]}
-				]}
-			]}
-		],
-		"get":[
-			"contractor_id"
-		],
-		"list":[
-			"page", "per_page"
-		],
-		"delete":[
-			"contractor_id"
-		],
-	},
-
-	"currency":{
-		"list":[
-			"page", "per_page"
-		]
-	},
-
-	"estimate":{
-		"create":[
-			{"estimate":[
-				"client_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"status", "date", "po_number", "discount", "currency_code", "language", "notes", "terms",
-				"first_name", "last_name", "organization", "p_street1", "p_street2", "p_city", "p_state",
-				"p_country", "p_code", "vat_name", "vat_number",
-				{"lines":[
-					{"line":[
-						"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"estimate":[
-				"estimate_id", "client_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"status", "date", "po_number", "discount", "currency_code", "language", "notes", "terms",
-				"first_name", "last_name", "organization", "p_street1", "p_street2", "p_city", "p_state",
-				"p_country", "p_code", "vat_name", "vat_number",
-				{"lines":[
-					{"line":[
-						"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
-					]}
-				]}
-			]}
-		],
-		"get":[
-			"estimate_id"
-		],
-		"delete":[
-			"estimate_id"
-		],
-		"list":[
-			"page", "per_page", "client_id", "date_from", "date_to", "folder", "order"
-		],
-		"sendByEmail":[
-			"estimate_id", "subject", "message"
-		],
-		"getPDF":[
-			"estimate_id"
-		],
-		"accept":[
-			"estimate_id"
-		],
-		"markAsSent":[
-			"estimate_id"
-		]
-	},
-
-	"expense":{
-		"create":[
-			{"expense":[
-				"staff_id", "category_id", "project_id", "client_id", "amount", "vendor", "date", "notes", "status",
-				"tax1_name", "tax1_percent", "tax1_amount", "tax2_name", "tax2_percent", "tax2_amount", "compound_tax"
-			]}
-		],
-		"update":[
-			{"expense":[
-				"expense_id", "staff_id", "category_id", "project_id", "client_id", "amount", "vendor", "date", "notes", "status",
-				"tax1_name", "tax1_percent", "tax1_amount", "tax2_name", "tax2_percent", "tax2_amount", "compound_tax"
-			]}
-		],
-		"get":[
-			"expense_id"
-		],
-		"delete":[
-			"expense_id"
-		],
-		"list":[
-			"page", "per_page", "client_id", "date_from", "date_to", "folder", "order"
-		],
-		"invoice":[
-			{"expenses": [
-				{"expense": [
-					"expense_id"
-				]}
-			]}
-		]
-	},
-
-	"gateway":{
-		"create":[
-			{"gateway":[
-				"name", "user_id"
-			]}
-		],
-		"update":[
-			{"gateway":[
-				"name", "user_id"
-			]}
-		],
-		"delete":[
-			{"gateway":[
-				"name"
-			]}
-		],
-		"list":[
-			"page", "per_page", "autobill_capable"
-		]
-	},
-
-	"invoice":{
-		"create":[
-			{"invoice":[
-				"client_id", "estimate_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"number", "status", "date", "po_number", "discount", "notes",
-				"currency_code", "language", "terms", "return_uri", "first_name", "last_name", "organization",
-				"p_street1", "p_street2", "p_city", "p_state", "p_country", "p_code", "vat_name", "vat_number",
-				{"lines":[
-					{"line":[
-						"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type", "expense_id",
-						{"time_entries" : [
-							{"time_entry": [
-								"time_entry_id"
-							]}
-						]}
-					]}
-				]},
-				{"gateways":[
-					{"gateway":[
-						"name", "type"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"invoice":[
-				"invoice_id", "client_id", "estimate_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"number", "status", "date", "po_number", "discount", "notes",
-				"currency_code", "language", "terms", "return_uri", "first_name", "last_name", "organization",
-				"p_street1", "p_street2", "p_city", "p_state", "p_country", "p_code", "vat_name", "vat_number",
-				{"lines":[
-					{"line":[
-						"line_id", "name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
-					]}
-				]},
-				{"gateways":[
-					{"gateway":[
-						"name", "type"
-					]}
-				]}
-			]}
-		],
-		"get":[
-			"invoice_id"
-		],
-		"delete":[
-			"invoice_id"
-		],
-		"list":[
-			"page", "per_page", "client_id", "recurring_id", "status", "date_from", "date_to",
-			"updated_from", "updated_to", "folder", "order"
-		],
-		"getPDF": [
-			"invoice_id"
-		],
-		"sendByEmail":[
-			"invoice_id", "subject", "message"
-		],
-		"sendBySnailMail":[
-			"invoice_id", "subject", "message"
-		],
-		"generate":[
-			"client_id", "date_from", "date_to", "time_entry_format", "include_expenses",
-			{"description_info":[
-				"project_name", "task_name", "team_member", "entry_date", "notes",
-			]},
-			{"projects":[
-				{"project":[
-					"project_id",
-				]}
-			]}
-		],
-		"lines.add":[
-			"invoice_id",
-			{"lines":[
-				{"line":[
-					"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-					"tax1_percent","tax2_percent", "compound_tax", "type"
-				]}
-			]}
-		],
-		"lines.delete":[
-			"invoice_id", "line_id"
-		],
-		"lines.update":[
-			"invoice_id",
-			{"lines":[
-				{"line":[
-					"line_id", "name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-					"tax1_percent", "tax2_percent", "compound_tax", "type"
-				]}
-			]}
-		]
-	},
-
-	"item":{
-		"create":[
-			{"item":[
-				"name", "description", "unit_cost", "quantity", "inventory", "tax1_id", "tax2_id"
-			]}
-		],
-		"update":[
-			{"item":[
-				"item_id", "name", "description", "unit_cost", "quantity", "inventory", "tax1_id", "tax2_id"
-			]}
-		],
-		"get":[
-			"item_id"
-		],
-		"delete":[
-			"item_id"
-		],
-		"list":[
-			"page", "per_page", "folder", "order"
-		]
-	},
-
-	"language":{
-		"list":[
-			"page", "per_page"
-		]
-	},
-
-	"payment":{
-		"create":[
-			{"payment":[
-				"client_id", "invoice_id", "date", "amount", "currency_code", "type", "notes"
-			]}
-		],
-		"update":[
-			{"payment":[
-				"payment_id", "amount", "currency_code", "notes"
-			]}
-		],
-		"get":[
-			"payment_id"
-		],
-		"delete":[
-			"payment_id"
-		],
-		"list":[
-			"page", "per_page", "client_id", "invoice_id", "date_from", "date_to", "updated_from", "updated_to"
-		]
-	},
-
-	"project":{
-		"create":[
-			{"project":[
-				"name", "bill_method", "client_id", "rate", "description", "hour_budget", "project_manager_id",
-				{"tasks":[
-					{"task": [
-						"task_id"
-					]}
-				]},
-				{"staff":[
-					{"staff":[
-						"staff_id"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"project":[
-				"project_id", "name", "bill_method", "client_id", "rate", "description", "hour_budget","project_manager_id",
-				{"tasks":[
-					"task_id"
-				]},
-				{"staff":[
-					{"staff":[
-						"staff_id"
-					]}
-				]}
-			]}
-		],
-		"get":[
-			"project_id",
-			{"includes":[
-				{"include":[
-					"name"
-				]}
-			]}
-		],
-		"delete":[
-			"project_id"
-		],
-		"list":[
-			"page", "per_page", "order",
-			{"includes":[
-				{"include":[
-					"name"
-				]}
-			]}
-		]
-	},
-
-	"receipt":{
-		"get":[
-			"expense_id"
-		],
-		"delete":[
-			"expense_id"
-		],
-	},
-
-	"recurring":{
-		"create":[
-			{"recurring":[
-				"client_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"date", "po_number", "discount", "occurrences", "frequency", "send_email",
-				"send_snail_mail", "notes", "currency_code", "language", "terms", "return_uri",
-				"first_name", "last_name", "organization", "p_street1", "p_street2", "p_city",
-				"p_state", "p_country", "p_code", "vat_name", "vat_number", "return_uri",
-				{"autobill":[
-					"gateway_name",
-					{"card":[
-						"number", "name",
-						{"expiration":[
-							"month", "year"
-						]}
-					]}
-				]},
-				{"lines":[
-					{"line":[
-						"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"recurring":[
-				"recurring_id", "client_id",
-				{"contacts":[
-					{"contact":[
-						"contact_id"
-					]}
-				]},
-				"stopped", "date", "po_number", "discount", "occurrences", "frequency", "send_email",
-				"send_snail_mail", "notes", "currency_code", "language", "terms", "return_uri",
-				"first_name", "last_name", "organization", "p_street1", "p_street2", "p_city", "p_state",
-				"p_country", "p_code", "vat_name", "vat_number", "return_uri",
-				{"autobill":[
-					"gateway_name",
-					{"card":[
-						"number", "name",
-						{"expiration":[
-							"month", "year"
-						]}
-					]}
-				]},
-				{"lines":[
-					{"line":[
-						"line_id", "name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-						"tax1_percent", "tax2_percent", "compound_tax", "type"
-					]}
-				]}
-			]}
-		],
-		"get":[
-			"recurring_id"
-		],
-		"delete":[
-			"recurring_id"
-		],
-		"list":[
-			"page", "per_page", "client_id", "autobill", "folder", "date_from", "date_to", "updated_from", "updated_to"
-		],
-		"lines.add":[
-			"recurring_id",
-			{"lines":[
-				{"line":[
-					"name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-					"tax1_percent", "tax2_percent", "compound_tax", "type"
-				]}
-			]}
-		],
-		"lines.delete":[
-			"recurring_id", "line_id"
-		],
-		"lines.update":[
-			"recurring_id",
-			{"lines":[
-				{"line":[
-					"line_id", "name", "description", "unit_cost", "quantity", "tax1_name", "tax2_name",
-					"tax1_percent", "tax2_percent", "compound_tax", "type"
-				]}
-			]}
-		]
-	},
-
-	"report":{
-		"getInvoiceDetails": [
-			"status", "client_id", "date_from", "date_to", "group_by"
-		],
-		"getEstimateDetails": [
-			"client_id", "date_from", "date_to"
-		],
-		"getExpenseDetails": [
-			"client_id", "date_from", "date_to", "group_by"
-		],
-		"getProfitDetails": [
-			"date_from", "date_to", "group_by"
-		],
-		"getClientDetails": [
-			"client_id"
-		],
-	},
-
-	"staff":{
-		"create":[
-			{"staff":[
-				"first_name", "last_name", "email", "username", "password", "email_credentials", "country", "state", "city", "street1", "street2",
-				"code", "home_phone", "business_phone", "mobile_phone", "fax", "rate",
-				{"projects":[
-					{"project":[
-						"project_id"
-					]}
-				]}
-			]}
-		],
-		"update":[
-			{"staff":[
-				"staff_id", "first_name", "last_name", "email", "username", "password", "email_credentials", "country", "state", "city", "street1", "street2",
-				"code", "home_phone", "business_phone", "mobile_phone", "fax", "rate",
-				{"projects":[
-					{"project":[
-						"project_id"
-					]}
-				]}
-			]}
-		],
-		"current":[],
-		"get":[
-			"staff_id"
-		],
-		"delete":[
-			"staff_id"
-		],
-		"list":[
-			"page", "per_page", "order"
-		]
-	},
-
-	"session":{
-		"create":[
-			{"session":[
-				"target"
-			]}
-		]
-	},
-
-	"system":{
-		"current":[],
-		"create":[
-			{"system":[
-				"name",
-				"email",
-				"username",
-				"password",
-				"first_name",
-				"last_name",
-				{"address" : [
-					"street_1", "street_2", "city", "province", "country", "postal_code"
-				]},
-				"profession", "currency_code", "work_phone",
-				"terms",
-				{"notifications" : [
-					"late_payment_reminder_1", "late_payment_reminder_2", "late_payment_reminder_3",
-				]}
-			]}
-		],
-		"getRecentActivity":[],
-		"update":[
-			{"system":[
-				"name",
-				"email",
-				"username",
-				"password",
-				"first_name",
-				"last_name",
-				{"address" : [
-					"street_1", "street_2", "city", "province", "country", "postal_code"
-				]},
-				"profession", "currency_code", "work_phone",
-				"terms",
-				{"notifications" : [
-					"late_payment_reminder_1", "late_payment_reminder_2", "late_payment_reminder_3",
-				]}
-			]}
-		]
-	},
-
-	"task":{
-		"create":[
-			{"task":[
-				"name", "billable", "rate", "description"
-			]}
-		],
-		"update":[
-			{"task":[
-				"task_id", "name", "name", "billable", "rate", "description"
-			]}
-		],
-		"get":[
-			"task_id"
-		],
-		"delete":[
-			"task_id"
-		],
-		"list":[
-			"page", "per_page", "project_id", "order"
-		]
-	},
-
-	"tax":{
-		"create":[
-			{"tax":[
-				"name", "rate", "number", "compound"
-			]}
-		],
-		"update":[
-			{"tax":[
-				"tax_id", "rate", "number", "compound"
-			]}
-		],
-		"get":[
-			"tax_id"
-		],
-		"list":[
-			"page", "per_page", "compound", "order",
-		],
-		"delete":[
-			"tax_id"
-		]
-	},
-
-	"time_entry":{
-		"create":[
-			{"time_entry":[
-				"project_id", "task_id", "staff_id", "hours", "notes", "date"
-			]}
-		],
-		"update":[
-			{"time_entry":[
-				"time_entry_id", "project_id", "task_id", "staff_id", "hours", "notes", "date"
-			]}
-		],
-		"get":[
-				"time_entry_id"
-		],
-		"delete":[
-			"time_entry_id"
-		],
-		"list":[
-			"page", "per_page", "project_id", "task_id", "date_from", "date_to", "order"
-		]
-	}
-
-};
+{
+  "callback": {
+    "create": [
+      {
+        "callback": [
+          "event",
+          "uri"
+        ]
+      }
+    ],
+    "verify": [
+      {
+        "callback": [
+          "callback_id",
+          "verifier"
+        ]
+      }
+    ],
+    "resendToken": [
+      "callback_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "event",
+      "uri"
+    ],
+    "delete": [
+      "callback_id"
+    ]
+  },
+  "category": {
+    "create": [
+      {
+        "category": [
+          "name"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "category": [
+          "category_id",
+          "name"
+        ]
+      }
+    ],
+    "get": [
+      "category_id"
+    ],
+    "delete": [
+      "category_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "order",
+      "parent_id"
+    ]
+  },
+  "client": {
+    "create": [
+      {
+        "client": [
+          "first_name",
+          "last_name",
+          "organization",
+          "email",
+          "username",
+          "password",
+          "work_phone",
+          "home_phone",
+          "mobile",
+          "fax",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "username",
+                  "password",
+                  "phone1",
+                  "phone2"
+                ]
+              }
+            ]
+          },
+          "language",
+          "currency_code",
+          "notes",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "s_street1",
+          "s_street2",
+          "s_city",
+          "s_state",
+          "s_country",
+          "s_code",
+          "vat_name",
+          "vat_number"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "client": [
+          "client_id",
+          "first_name",
+          "last_name",
+          "organization",
+          "email",
+          "username",
+          "password",
+          "work_phone",
+          "home_phone",
+          "mobile",
+          "fax",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id",
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "username",
+                  "password",
+                  "phone1",
+                  "phone2"
+                ]
+              }
+            ]
+          },
+          "language",
+          "currency_code",
+          "notes",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "s_street1",
+          "s_street2",
+          "s_city",
+          "s_state",
+          "s_country",
+          "s_code",
+          "vat_name",
+          "vat_number"
+        ]
+      }
+    ],
+    "get": [
+      "client_id"
+    ],
+    "delete": [
+      "client_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "email",
+      "username",
+      "updated_from",
+      "update_to",
+      "folder",
+      "notes",
+      "order"
+    ]
+  },
+  "contractor": {
+    "create": [
+      {
+        "contractor": [
+          "name",
+          "email",
+          "rate",
+          "task_id",
+          {
+            "projects": [
+              {
+                "project": [
+                  "project_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "contractor": [
+          "contractor_id",
+          "name",
+          "email",
+          "rate",
+          "task_id",
+          {
+            "projects": [
+              {
+                "project": [
+                  "project_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get": [
+      "contractor_id"
+    ],
+    "list": [
+      "page",
+      "per_page"
+    ],
+    "delete": [
+      "contractor_id"
+    ]
+  },
+  "currency": {
+    "list": [
+      "page",
+      "per_page"
+    ]
+  },
+  "estimate": {
+    "create": [
+      {
+        "estimate": [
+          "client_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "status",
+          "date",
+          "po_number",
+          "discount",
+          "currency_code",
+          "language",
+          "notes",
+          "terms",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          {
+            "lines": [
+              {
+                "line": [
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "estimate": [
+          "estimate_id",
+          "client_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "status",
+          "date",
+          "po_number",
+          "discount",
+          "currency_code",
+          "language",
+          "notes",
+          "terms",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          {
+            "lines": [
+              {
+                "line": [
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get": [
+      "estimate_id"
+    ],
+    "delete": [
+      "estimate_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "client_id",
+      "date_from",
+      "date_to",
+      "folder",
+      "order"
+    ],
+    "sendByEmail": [
+      "estimate_id",
+      "subject",
+      "message"
+    ],
+    "getPDF": [
+      "estimate_id"
+    ],
+    "accept": [
+      "estimate_id"
+    ],
+    "markAsSent": [
+      "estimate_id"
+    ]
+  },
+  "expense": {
+    "create": [
+      {
+        "expense": [
+          "staff_id",
+          "category_id",
+          "project_id",
+          "client_id",
+          "amount",
+          "vendor",
+          "date",
+          "notes",
+          "status",
+          "tax1_name",
+          "tax1_percent",
+          "tax1_amount",
+          "tax2_name",
+          "tax2_percent",
+          "tax2_amount",
+          "compound_tax"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "expense": [
+          "expense_id",
+          "staff_id",
+          "category_id",
+          "project_id",
+          "client_id",
+          "amount",
+          "vendor",
+          "date",
+          "notes",
+          "status",
+          "tax1_name",
+          "tax1_percent",
+          "tax1_amount",
+          "tax2_name",
+          "tax2_percent",
+          "tax2_amount",
+          "compound_tax"
+        ]
+      }
+    ],
+    "get": [
+      "expense_id"
+    ],
+    "delete": [
+      "expense_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "client_id",
+      "date_from",
+      "date_to",
+      "folder",
+      "order"
+    ],
+    "invoice": [
+      {
+        "expenses": [
+          {
+            "expense": [
+              "expense_id"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "gateway": {
+    "create": [
+      {
+        "gateway": [
+          "name",
+          "user_id"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "gateway": [
+          "name",
+          "user_id"
+        ]
+      }
+    ],
+    "delete": [
+      {
+        "gateway": [
+          "name"
+        ]
+      }
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "autobill_capable"
+    ]
+  },
+  "invoice": {
+    "create": [
+      {
+        "invoice": [
+          "client_id",
+          "estimate_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "number",
+          "status",
+          "date",
+          "po_number",
+          "discount",
+          "notes",
+          "currency_code",
+          "language",
+          "terms",
+          "return_uri",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          {
+            "lines": [
+              {
+                "line": [
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type",
+                  "expense_id",
+                  {
+                    "time_entries": [
+                      {
+                        "time_entry": [
+                          "time_entry_id"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "gateways": [
+              {
+                "gateway": [
+                  "name",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "invoice": [
+          "invoice_id",
+          "client_id",
+          "estimate_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "number",
+          "status",
+          "date",
+          "po_number",
+          "discount",
+          "notes",
+          "currency_code",
+          "language",
+          "terms",
+          "return_uri",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          {
+            "lines": [
+              {
+                "line": [
+                  "line_id",
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type"
+                ]
+              }
+            ]
+          },
+          {
+            "gateways": [
+              {
+                "gateway": [
+                  "name",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get": [
+      "invoice_id"
+    ],
+    "delete": [
+      "invoice_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "client_id",
+      "recurring_id",
+      "status",
+      "date_from",
+      "date_to",
+      "updated_from",
+      "updated_to",
+      "folder",
+      "order"
+    ],
+    "getPDF": [
+      "invoice_id"
+    ],
+    "sendByEmail": [
+      "invoice_id",
+      "subject",
+      "message"
+    ],
+    "sendBySnailMail": [
+      "invoice_id",
+      "subject",
+      "message"
+    ],
+    "generate": [
+      "client_id",
+      "date_from",
+      "date_to",
+      "time_entry_format",
+      "include_expenses",
+      {
+        "description_info": [
+          "project_name",
+          "task_name",
+          "team_member",
+          "entry_date",
+          "notes"
+        ]
+      },
+      {
+        "projects": [
+          {
+            "project": [
+              "project_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "lines.add": [
+      "invoice_id",
+      {
+        "lines": [
+          {
+            "line": [
+              "name",
+              "description",
+              "unit_cost",
+              "quantity",
+              "tax1_name",
+              "tax2_name",
+              "tax1_percent",
+              "tax2_percent",
+              "compound_tax",
+              "type"
+            ]
+          }
+        ]
+      }
+    ],
+    "lines.delete": [
+      "invoice_id",
+      "line_id"
+    ],
+    "lines.update": [
+      "invoice_id",
+      {
+        "lines": [
+          {
+            "line": [
+              "line_id",
+              "name",
+              "description",
+              "unit_cost",
+              "quantity",
+              "tax1_name",
+              "tax2_name",
+              "tax1_percent",
+              "tax2_percent",
+              "compound_tax",
+              "type"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "item": {
+    "create": [
+      {
+        "item": [
+          "name",
+          "description",
+          "unit_cost",
+          "quantity",
+          "inventory",
+          "tax1_id",
+          "tax2_id"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "item": [
+          "item_id",
+          "name",
+          "description",
+          "unit_cost",
+          "quantity",
+          "inventory",
+          "tax1_id",
+          "tax2_id"
+        ]
+      }
+    ],
+    "get": [
+      "item_id"
+    ],
+    "delete": [
+      "item_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "folder",
+      "order"
+    ]
+  },
+  "language": {
+    "list": [
+      "page",
+      "per_page"
+    ]
+  },
+  "payment": {
+    "create": [
+      {
+        "payment": [
+          "client_id",
+          "invoice_id",
+          "date",
+          "amount",
+          "currency_code",
+          "type",
+          "notes"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "payment": [
+          "payment_id",
+          "amount",
+          "currency_code",
+          "notes"
+        ]
+      }
+    ],
+    "get": [
+      "payment_id"
+    ],
+    "delete": [
+      "payment_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "client_id",
+      "invoice_id",
+      "date_from",
+      "date_to",
+      "updated_from",
+      "updated_to"
+    ]
+  },
+  "project": {
+    "create": [
+      {
+        "project": [
+          "name",
+          "bill_method",
+          "client_id",
+          "rate",
+          "description",
+          "hour_budget",
+          "project_manager_id",
+          {
+            "tasks": [
+              {
+                "task": [
+                  "task_id"
+                ]
+              }
+            ]
+          },
+          {
+            "staff": [
+              {
+                "staff": [
+                  "staff_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "project": [
+          "project_id",
+          "name",
+          "bill_method",
+          "client_id",
+          "rate",
+          "description",
+          "hour_budget",
+          "project_manager_id",
+          {
+            "tasks": [
+              "task_id"
+            ]
+          },
+          {
+            "staff": [
+              {
+                "staff": [
+                  "staff_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get": [
+      "project_id",
+      {
+        "includes": [
+          {
+            "include": [
+              "name"
+            ]
+          }
+        ]
+      }
+    ],
+    "delete": [
+      "project_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "order",
+      {
+        "includes": [
+          {
+            "include": [
+              "name"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "receipt": {
+    "get": [
+      "expense_id"
+    ],
+    "delete": [
+      "expense_id"
+    ]
+  },
+  "recurring": {
+    "create": [
+      {
+        "recurring": [
+          "client_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "date",
+          "po_number",
+          "discount",
+          "occurrences",
+          "frequency",
+          "send_email",
+          "send_snail_mail",
+          "notes",
+          "currency_code",
+          "language",
+          "terms",
+          "return_uri",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          "return_uri",
+          {
+            "autobill": [
+              "gateway_name",
+              {
+                "card": [
+                  "number",
+                  "name",
+                  {
+                    "expiration": [
+                      "month",
+                      "year"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lines": [
+              {
+                "line": [
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "recurring": [
+          "recurring_id",
+          "client_id",
+          {
+            "contacts": [
+              {
+                "contact": [
+                  "contact_id"
+                ]
+              }
+            ]
+          },
+          "stopped",
+          "date",
+          "po_number",
+          "discount",
+          "occurrences",
+          "frequency",
+          "send_email",
+          "send_snail_mail",
+          "notes",
+          "currency_code",
+          "language",
+          "terms",
+          "return_uri",
+          "first_name",
+          "last_name",
+          "organization",
+          "p_street1",
+          "p_street2",
+          "p_city",
+          "p_state",
+          "p_country",
+          "p_code",
+          "vat_name",
+          "vat_number",
+          "return_uri",
+          {
+            "autobill": [
+              "gateway_name",
+              {
+                "card": [
+                  "number",
+                  "name",
+                  {
+                    "expiration": [
+                      "month",
+                      "year"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lines": [
+              {
+                "line": [
+                  "line_id",
+                  "name",
+                  "description",
+                  "unit_cost",
+                  "quantity",
+                  "tax1_name",
+                  "tax2_name",
+                  "tax1_percent",
+                  "tax2_percent",
+                  "compound_tax",
+                  "type"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "get": [
+      "recurring_id"
+    ],
+    "delete": [
+      "recurring_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "client_id",
+      "autobill",
+      "folder",
+      "date_from",
+      "date_to",
+      "updated_from",
+      "updated_to"
+    ],
+    "lines.add": [
+      "recurring_id",
+      {
+        "lines": [
+          {
+            "line": [
+              "name",
+              "description",
+              "unit_cost",
+              "quantity",
+              "tax1_name",
+              "tax2_name",
+              "tax1_percent",
+              "tax2_percent",
+              "compound_tax",
+              "type"
+            ]
+          }
+        ]
+      }
+    ],
+    "lines.delete": [
+      "recurring_id",
+      "line_id"
+    ],
+    "lines.update": [
+      "recurring_id",
+      {
+        "lines": [
+          {
+            "line": [
+              "line_id",
+              "name",
+              "description",
+              "unit_cost",
+              "quantity",
+              "tax1_name",
+              "tax2_name",
+              "tax1_percent",
+              "tax2_percent",
+              "compound_tax",
+              "type"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "report": {
+    "getInvoiceDetails": [
+      "status",
+      "client_id",
+      "date_from",
+      "date_to",
+      "group_by"
+    ],
+    "getEstimateDetails": [
+      "client_id",
+      "date_from",
+      "date_to"
+    ],
+    "getExpenseDetails": [
+      "client_id",
+      "date_from",
+      "date_to",
+      "group_by"
+    ],
+    "getProfitDetails": [
+      "date_from",
+      "date_to",
+      "group_by"
+    ],
+    "getClientDetails": [
+      "client_id"
+    ]
+  },
+  "staff": {
+    "create": [
+      {
+        "staff": [
+          "first_name",
+          "last_name",
+          "email",
+          "username",
+          "password",
+          "email_credentials",
+          "country",
+          "state",
+          "city",
+          "street1",
+          "street2",
+          "code",
+          "home_phone",
+          "business_phone",
+          "mobile_phone",
+          "fax",
+          "rate",
+          {
+            "projects": [
+              {
+                "project": [
+                  "project_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "update": [
+      {
+        "staff": [
+          "staff_id",
+          "first_name",
+          "last_name",
+          "email",
+          "username",
+          "password",
+          "email_credentials",
+          "country",
+          "state",
+          "city",
+          "street1",
+          "street2",
+          "code",
+          "home_phone",
+          "business_phone",
+          "mobile_phone",
+          "fax",
+          "rate",
+          {
+            "projects": [
+              {
+                "project": [
+                  "project_id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "current": [],
+    "get": [
+      "staff_id"
+    ],
+    "delete": [
+      "staff_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "order"
+    ]
+  },
+  "session": {
+    "create": [
+      {
+        "session": [
+          "target"
+        ]
+      }
+    ]
+  },
+  "system": {
+    "current": [],
+    "create": [
+      {
+        "system": [
+          "name",
+          "email",
+          "username",
+          "password",
+          "first_name",
+          "last_name",
+          {
+            "address": [
+              "street_1",
+              "street_2",
+              "city",
+              "province",
+              "country",
+              "postal_code"
+            ]
+          },
+          "profession",
+          "currency_code",
+          "work_phone",
+          "terms",
+          {
+            "notifications": [
+              "late_payment_reminder_1",
+              "late_payment_reminder_2",
+              "late_payment_reminder_3"
+            ]
+          }
+        ]
+      }
+    ],
+    "getRecentActivity": [],
+    "update": [
+      {
+        "system": [
+          "name",
+          "email",
+          "username",
+          "password",
+          "first_name",
+          "last_name",
+          {
+            "address": [
+              "street_1",
+              "street_2",
+              "city",
+              "province",
+              "country",
+              "postal_code"
+            ]
+          },
+          "profession",
+          "currency_code",
+          "work_phone",
+          "terms",
+          {
+            "notifications": [
+              "late_payment_reminder_1",
+              "late_payment_reminder_2",
+              "late_payment_reminder_3"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "task": {
+    "create": [
+      {
+        "task": [
+          "name",
+          "billable",
+          "rate",
+          "description"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "task": [
+          "task_id",
+          "name",
+          "name",
+          "billable",
+          "rate",
+          "description"
+        ]
+      }
+    ],
+    "get": [
+      "task_id"
+    ],
+    "delete": [
+      "task_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "project_id",
+      "order"
+    ]
+  },
+  "tax": {
+    "create": [
+      {
+        "tax": [
+          "name",
+          "rate",
+          "number",
+          "compound"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "tax": [
+          "tax_id",
+          "rate",
+          "number",
+          "compound"
+        ]
+      }
+    ],
+    "get": [
+      "tax_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "compound",
+      "order"
+    ],
+    "delete": [
+      "tax_id"
+    ]
+  },
+  "time_entry": {
+    "create": [
+      {
+        "time_entry": [
+          "project_id",
+          "task_id",
+          "staff_id",
+          "hours",
+          "notes",
+          "date"
+        ]
+      }
+    ],
+    "update": [
+      {
+        "time_entry": [
+          "time_entry_id",
+          "project_id",
+          "task_id",
+          "staff_id",
+          "hours",
+          "notes",
+          "date"
+        ]
+      }
+    ],
+    "get": [
+      "time_entry_id"
+    ],
+    "delete": [
+      "time_entry_id"
+    ],
+    "list": [
+      "page",
+      "per_page",
+      "project_id",
+      "task_id",
+      "date_from",
+      "date_to",
+      "order"
+    ]
+  }
+}
