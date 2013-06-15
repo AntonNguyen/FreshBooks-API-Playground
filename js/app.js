@@ -396,10 +396,7 @@ function makeServerRequest() {
 
 		successFn = function(xhr) {
 			if (xhr.target.readyState==4 && xhr.target.status==200) {
-				var bb = new window.WebKitBlobBuilder();
-				bb.append(this.response);
-
-				var blob = bb.getBlob(contentType);
+				var blob = new Blob([this.response], {type: contentType});
 				var blobURL = window.webkitURL.createObjectURL(blob);
 				window.open(blobURL);
 			}
@@ -408,16 +405,13 @@ function makeServerRequest() {
 		};
 
 	} else if (currentResource == 'receipt' && currentMethod == 'get') {
-		contentType = "image/xyz";
+		contentType = "image";
 		responseType = "arraybuffer";
 		displayCode('response', 'Image Downloading..');
 
 		successFn = function(xhr) {
 			if (xhr.target.readyState==4 && xhr.target.status==200) {
-				var bb = new window.WebKitBlobBuilder();
-				bb.append(this.response);
-
-				var blob = bb.getBlob(contentType);
+				var blob = new Blob([this.response], {type: contentType});
 				var blobURL = window.webkitURL.createObjectURL(blob);
 
 				$('#receipt').attr("src", blobURL);
