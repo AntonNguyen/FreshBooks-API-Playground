@@ -352,6 +352,18 @@ function tabs(count) {
 	return tabs;
 }
 
+function getBinaryRequestSuccessCallback(displayBinaryData) {
+	return function(xhr) {
+		if (xhr.target.readyState==4 && xhr.target.status==200) {
+			var blob = new Blob([this.response], {type: contentType});
+			var blobURL = window.webkitURL.createObjectURL(blob);
+			after(blobURL);
+		}
+		$('#loader').hide();
+		displayCode('response', "Download complete!");
+	};
+}
+
 function makeServerRequest() {
 	var xmlRequest = createRequest();
 	var transport = null;
@@ -394,35 +406,22 @@ function makeServerRequest() {
 		responseType = "arraybuffer";
 		displayCode('response', 'PDF Downloading..');
 
-		successFn = function(xhr) {
-			if (xhr.target.readyState==4 && xhr.target.status==200) {
-				var blob = new Blob([this.response], {type: contentType});
-				var blobURL = window.webkitURL.createObjectURL(blob);
-				window.open(blobURL);
-			}
-			$('#loader').hide();
-			displayCode('response', "Download complete!");
-		};
+		successFn = getBinaryRequestSuccessCallback(function(url) {
+			window.open(url);
+		});
 
 	} else if (currentResource == 'receipt' && currentMethod == 'get') {
 		contentType = "image";
 		responseType = "arraybuffer";
 		displayCode('response', 'Image Downloading..');
 
-		successFn = function(xhr) {
-			if (xhr.target.readyState==4 && xhr.target.status==200) {
-				var blob = new Blob([this.response], {type: contentType});
-				var blobURL = window.webkitURL.createObjectURL(blob);
-
-				$('#receipt').attr("src", blobURL);
-				$('#overlay').fadeIn('fast',function(){
-					$('#box').show();
-					$('#box').animate({'top':'160px'},500);
-				});
-			}
-			$('#loader').hide();
-			displayCode('response', "Download complete!");
-		};
+		successFn = getBinaryRequestSuccessCallback(function(url) {
+			$('#receipt').attr("src", url);
+			$('#overlay').fadeIn('fast', function() {
+				$('#box').show();
+				$('#box').animate({'top':'160px'}, 500);
+			});
+		});
 	}
 
 	transport.makeAPIRequest(xmlRequest, successFn, errorFn, contentType, responseType);
